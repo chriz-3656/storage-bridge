@@ -10,6 +10,9 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "storage-bridge",
 	Short: "A lightweight universal storage engine",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return runTUI()
+	},
 }
 
 func main() {

@@ -14,6 +14,7 @@ type Provider interface {
 	Get(ctx context.Context, path string, offset, length int64) (io.ReadCloser, error)
 	Put(ctx context.Context, path string, in io.Reader, size int64, modTime time.Time) error
 	Remove(ctx context.Context, path string) error
+	SpaceUsed(ctx context.Context, path string) (int64, error)
 }
 
 type Entry struct {

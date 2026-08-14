@@ -187,3 +187,14 @@ func (p *Provider) Remove(ctx context.Context, path string) error {
 	}
 	return nil
 }
+
+func (p *Provider) SpaceUsed(ctx context.Context, path string) (int64, error) {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+
+	var total int64
+	for _, f := range p.files {
+		total += int64(len(f.data))
+	}
+	return total, nil
+}

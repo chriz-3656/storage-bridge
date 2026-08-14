@@ -190,3 +190,29 @@ func (p *Provider) Remove(ctx context.Context, path string) error {
 	
 	return err
 }
+
+func (p *Provider) SpaceUsed(ctx context.Context, path string) (int64, error) {
+	path = strings.TrimPrefix(path, "/")
+	prefix := path
+	if prefix != "" && !strings.HasSuffix(prefix, "/") {
+		prefix += "/"
+	}
+
+	paginator := s3.NewListObjectsV2Paginator(p.client, &s3.ListObjectsV2Input{
+		Bucket: aws.String(p.bucket),
+		Prefix: aws.String(prefix),
+	})
+
+	var total int64
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			return 0, err
+		}
+		for _, obj := range page.Contents {
+			total += aws.ToInt64(obj.Size)
+		}
+	}
+
+	return total, nil
+}

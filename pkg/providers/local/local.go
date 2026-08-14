@@ -181,3 +181,26 @@ func (p *Provider) Remove(ctx context.Context, path string) error {
 	}
 	return nil
 }
+
+func (p *Provider) SpaceUsed(ctx context.Context, path string) (int64, error) {
+	fullPath, err := p.resolve(path)
+	if err != nil {
+		return 0, err
+	}
+
+	var total int64
+	err = filepath.WalkDir(fullPath, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return nil
+		}
+		if !d.IsDir() {
+			info, err := d.Info()
+			if err == nil {
+				total += info.Size()
+			}
+		}
+		return nil
+	})
+
+	return total, err
+}
