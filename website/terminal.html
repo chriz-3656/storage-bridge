@@ -8,177 +8,202 @@
         :root {
             --bg-base: 228 10% 4%; --bg-surface: 228 8% 8%; --bg-elevated: 228 8% 12%;
             --text-primary: 0 0% 98%; --text-secondary: 228 10% 60%;
-            --accent: 210 100% 55%; --border-dim: 228 8% 16%;
-            --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 2rem; --spacing-xl: 4rem;
+            --accent: 210 100% 55%; --accent-hover: 210 100% 65%;
+            --border-dim: 228 8% 16%; --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 2rem;
             --radius-md: 8px; --radius-lg: 12px;
-            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
             --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: var(--font-sans); background: hsl(var(--bg-base)); color: hsl(var(--text-primary)); line-height: 1.6; -webkit-font-smoothing: antialiased; }
-        
-        h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
-        h1 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: var(--spacing-md); text-align: center; }
-        p.subtitle { color: hsl(var(--text-secondary)); text-align: center; margin-bottom: var(--spacing-xl); }
-        
-        .container { max-width: 1000px; margin: 0 auto; padding: 0 var(--spacing-lg); }
-        
+        body { font-family: var(--font-sans); background: hsl(var(--bg-base)); color: hsl(var(--text-primary)); line-height: 1.6; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
         /* Nav */
-        nav { padding: var(--spacing-lg) 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid hsl(var(--border-dim)); margin-bottom: var(--spacing-xl); }
-        .logo { font-weight: 700; font-size: 1.25rem; display: flex; align-items: center; gap: var(--spacing-sm); text-decoration: none; color: hsl(var(--text-primary)); }
+        nav { padding: var(--spacing-md) 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid hsla(var(--border-dim), 0.5); background: hsl(var(--bg-base)); flex-shrink: 0; }
+        .logo { font-weight: 700; font-size: 1.25rem; display: flex; align-items: center; gap: var(--spacing-sm); text-decoration: none; color: white; }
         .logo svg { width: 24px; height: 24px; color: hsl(var(--accent)); }
-        .nav-links { display: flex; gap: var(--spacing-lg); }
+        .nav-links { display: flex; gap: var(--spacing-lg); align-items: center; }
         .nav-links a { color: hsl(var(--text-secondary)); text-decoration: none; font-size: 0.95rem; font-weight: 500; transition: color 0.2s; }
         .nav-links a:hover, .nav-links a.active { color: hsl(var(--text-primary)); }
 
+        .layout { display: flex; flex-grow: 1; overflow: hidden; }
+
+        /* Sidebar */
+        .sidebar { width: 350px; background: hsl(var(--bg-surface)); border-right: 1px solid hsl(var(--border-dim)); display: flex; flex-direction: column; }
+        .command-list { flex: 1; overflow-y: auto; padding: var(--spacing-md); border-bottom: 1px solid hsl(var(--border-dim)); }
+        .cmd-item { padding: 12px 16px; border-radius: var(--radius-md); cursor: pointer; transition: background 0.2s; margin-bottom: 4px; display: flex; flex-direction: column; gap: 4px; border: 1px solid transparent; }
+        .cmd-item:hover { background: hsl(var(--bg-elevated)); }
+        .cmd-item.active { background: hsla(var(--accent), 0.1); border-color: hsla(var(--accent), 0.3); }
+        .cmd-name { font-family: var(--font-mono); font-weight: bold; color: hsl(var(--accent)); font-size: 0.9rem; }
+        .cmd-desc { font-size: 0.8rem; color: hsl(var(--text-secondary)); }
+
+        .docs-panel { flex: 1; overflow-y: auto; padding: var(--spacing-md) var(--spacing-lg); background: hsl(var(--bg-base)); }
+        .docs-panel h3 { margin-bottom: 8px; }
+        .docs-panel p { font-size: 0.95rem; color: hsl(var(--text-secondary)); margin-bottom: 12px; }
+        .code-block { background: hsl(var(--bg-elevated)); padding: 12px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 0.85rem; margin-bottom: 12px; border: 1px solid hsl(var(--border-dim)); overflow-x: auto; }
+
         /* Terminal Window */
-        .terminal-window {
-            background: #000;
-            border-radius: var(--radius-lg);
-            border: 1px solid hsl(var(--border-dim));
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .terminal-header {
-            background: hsl(var(--bg-elevated));
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid hsl(var(--border-dim));
-        }
-
-        .terminal-dots {
-            display: flex;
-            gap: 6px;
-        }
-
-        .dot {
-            width: 12px; height: 12px;
-            border-radius: 50%;
-        }
-        .dot.red { background: #FF5F56; }
-        .dot.yellow { background: #FFBD2E; }
-        .dot.green { background: #27C93F; }
-
-        .terminal-title {
-            flex-grow: 1;
-            text-align: center;
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-            color: hsl(var(--text-secondary));
-        }
-
-        .terminal-body {
-            padding: var(--spacing-lg);
-            font-family: var(--font-mono);
-            font-size: 1rem;
-            color: #A8B2D1;
-            height: 400px;
-            overflow-y: auto;
-        }
+        .main-content { flex: 1; padding: var(--spacing-lg); display: flex; justify-content: center; align-items: center; background: radial-gradient(circle at center, hsl(var(--bg-surface)), hsl(var(--bg-base))); }
+        .terminal-window { width: 100%; max-width: 900px; height: 600px; background: #000; border-radius: var(--radius-lg); border: 1px solid hsl(var(--border-dim)); display: flex; flex-direction: column; box-shadow: 0 32px 64px rgba(0,0,0,0.6); }
+        .terminal-header { background: hsl(var(--bg-elevated)); padding: 12px 16px; display: flex; align-items: center; border-bottom: 1px solid hsl(var(--border-dim)); flex-shrink: 0; }
+        .terminal-dots { display: flex; gap: 6px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.r { background: #FF5F56; } .dot.y { background: #FFBD2E; } .dot.g { background: #27C93F; }
+        .terminal-title { flex-grow: 1; text-align: center; font-family: var(--font-mono); font-size: 0.85rem; color: hsl(var(--text-secondary)); }
+        .terminal-body { padding: var(--spacing-lg); font-family: var(--font-mono); font-size: 1.05rem; color: #A8B2D1; flex: 1; overflow-y: auto; }
 
         .prompt { color: hsl(var(--accent)); font-weight: bold; margin-right: 8px; }
         .command { color: #FFF; }
-        .output { color: #A8B2D1; margin: 8px 0 16px 0; white-space: pre-wrap; line-height: 1.4; }
-        .cursor {
-            display: inline-block;
-            width: 8px; height: 16px;
-            background: #FFF;
-            animation: blink 1s step-end infinite;
-            vertical-align: text-bottom;
-        }
-
+        .output { color: #A8B2D1; margin: 8px 0 20px 0; white-space: pre-wrap; line-height: 1.5; }
+        .cursor { display: inline-block; width: 10px; height: 18px; background: #FFF; animation: blink 1s step-end infinite; vertical-align: text-bottom; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
-        .btn-replay {
-            display: block;
-            margin: var(--spacing-lg) auto;
-            background: transparent;
-            border: 1px solid hsl(var(--border-dim));
-            color: hsl(var(--text-primary));
-            padding: 8px 16px;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            font-family: var(--font-sans);
-            transition: background 0.2s;
-        }
-        .btn-replay:hover { background: hsl(var(--bg-surface)); }
-
-        footer { padding: var(--spacing-xl) 0; margin-top: var(--spacing-xl); border-top: 1px solid hsl(var(--border-dim)); text-align: center; color: hsl(var(--text-secondary)); }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <nav>
-        <a href="index.html" class="logo">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
-            Storage Bridge
-        </a>
-        <div class="nav-links">
-            <a href="index.html">Overview</a>
-            <a href="docs.html">Documentation</a>
-            <a href="terminal.html" class="active">Virtual Terminal</a>
-            <a href="https://github.com/chriz-3656/storage-bridge" target="_blank">GitHub</a>
-        </div>
-    </nav>
+<nav>
+    <a href="index.html" class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
+        Storage Bridge
+    </a>
+    <div class="nav-links">
+        <a href="index.html">Product</a>
+        <a href="terminal.html" class="active">Interactive Terminal</a>
+        <a href="docs.html">Docs</a>
+        <a href="index.html#developer">About</a>
+    </div>
+</nav>
 
-    <h1>Virtual Terminal</h1>
-    <p class="subtitle">Watch Storage Bridge in action across multiple cloud environments.</p>
-
-    <div class="terminal-window">
-        <div class="terminal-header">
-            <div class="terminal-dots">
-                <div class="dot red"></div>
-                <div class="dot yellow"></div>
-                <div class="dot green"></div>
-            </div>
-            <div class="terminal-title">user@cloud-engine: ~</div>
+<div class="layout">
+    <div class="sidebar">
+        <div class="command-list" id="cmd-list">
+            <!-- Populated by JS -->
         </div>
-        <div class="terminal-body" id="term-body">
-            <!-- Content injected by JS -->
+        <div class="docs-panel" id="docs-panel">
+            <h3 style="color: hsl(var(--text-secondary)); text-align: center; margin-top: 50px;">Select a command above</h3>
         </div>
     </div>
-    
-    <button class="btn-replay" onclick="startTyping()">Replay Animation</button>
 
-    <footer>
-        <p>&copy; 2026 Storage Bridge. Open-Source Multi-Cloud Architecture.</p>
-    </footer>
+    <div class="main-content">
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+                </div>
+                <div class="terminal-title">user@cloud-engine: ~</div>
+            </div>
+            <div class="terminal-body" id="term-body">
+                <div><span class="prompt">$</span><span class="cursor"></span></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-    const script = [
-        { cmd: "storage-bridge provider add my-r2 --type s3 --bucket images --endpoint https://123.r2.cloudflarestorage.com", out: "Successfully added provider 'my-r2'!\n" },
-        { cmd: "storage-bridge default set my-r2", out: "Default provider set to my-r2\n" },
-        { cmd: "storage-bridge list", out: "     231.2K  summer-vacation.jpg\n       1.1M  presentation.pdf\n" },
-        { cmd: "storage-bridge mkdir archives", out: "✓ Directory created successfully\n" },
-        { cmd: "storage-bridge move presentation.pdf archives/presentation.pdf", out: "✓ Moved successfully\n" },
-        { cmd: "storage-bridge cd archives", out: "" },
-        { cmd: "storage-bridge pwd", out: "my-r2:/archives\n" },
-        { cmd: "storage-bridge sync local:./old-backups my-r2:/archives --workers 8", out: "Building destination file list for my-r2:/archives...\nBuilding source file list for local:/old-backups...\n[Worker 1] Syncing old-backups/data1.csv → archives/data1.csv\n[Worker 2] Syncing old-backups/data2.csv → archives/data2.csv\n[Worker 1] ✓ Synced data1.csv\n[Worker 2] ✓ Synced data2.csv\nSync completed successfully.\n" }
+    const commands = [
+        {
+            id: "auth", name: "auth login", desc: "Authenticate with a cloud provider",
+            docs: "Initiates an OAuth web-server flow or prompts for credentials. The tokens are securely encrypted and stored in `~/.config/storage-bridge/config.json`.",
+            usage: "storage-bridge auth login <provider_type>",
+            script: [
+                { cmd: "storage-bridge auth login google", out: "Waiting for browser authentication...\n✓ Successfully authenticated with Google Drive. Refresh token secured." }
+            ]
+        },
+        {
+            id: "add", name: "provider add", desc: "Register a new cloud endpoint",
+            docs: "Adds a new named endpoint to your engine. Supports S3, Google Drive, Local, Union, and Memory. You can configure custom endpoints for R2/B2.",
+            usage: "storage-bridge provider add <alias> --type <type> [flags]",
+            script: [
+                { cmd: "storage-bridge provider add my-r2 --type s3 --bucket images --endpoint https://123.r2.cloudflarestorage.com", out: "Successfully added provider 'my-r2'!" },
+                { cmd: "storage-bridge default set my-r2", out: "Default provider set to my-r2" }
+            ]
+        },
+        {
+            id: "cd", name: "cd / pwd", desc: "Stateful cloud navigation",
+            docs: "Storage Bridge maintains a stateful connection context. You can change your working directory directly within a remote cloud.",
+            usage: "storage-bridge cd <path>\nstorage-bridge pwd",
+            script: [
+                { cmd: "storage-bridge cd /archives/2024", out: "" },
+                { cmd: "storage-bridge pwd", out: "my-r2:/archives/2024" }
+            ]
+        },
+        {
+            id: "list", name: "list", desc: "List files and folders",
+            docs: "Queries the active cloud directory. Displays sizes, mod times, and calculates virtual folder structures automatically.",
+            usage: "storage-bridge list [path]",
+            script: [
+                { cmd: "storage-bridge list", out: "     231.2K  summer-vacation.jpg\n       1.1M  presentation.pdf\n          0  old-backups/" }
+            ]
+        },
+        {
+            id: "move", name: "move", desc: "Native cloud renaming/moving",
+            docs: "Executes ultra-fast server-side move operations. E.g. modifies Google Drive parent IDs or uses S3 CopyObject + Delete without downloading.",
+            usage: "storage-bridge move <src> <dest>",
+            script: [
+                { cmd: "storage-bridge move presentation.pdf old-backups/presentation.pdf", out: "✓ Moved successfully" }
+            ]
+        },
+        {
+            id: "sync", name: "sync", desc: "Concurrent diff syncing",
+            docs: "The parallel Sync Engine calculates an in-memory diff map between a source and destination, transferring only missing/modified files using GoRoutines.",
+            usage: "storage-bridge sync <src> <dest> [--workers=N]",
+            script: [
+                { cmd: "storage-bridge sync local:./data my-r2:/archives/2024 --workers 8", out: "Building destination file list for my-r2:/archives/2024...\nBuilding source file list for local:./data...\n[Worker 1] Syncing data/file1.csv → archives/2024/file1.csv\n[Worker 2] Syncing data/file2.csv → archives/2024/file2.csv\n[Worker 1] ✓ Synced file1.csv\n[Worker 2] ✓ Synced file2.csv\nSync completed successfully." }
+            ]
+        },
+        {
+            id: "mcp", name: "mcp", desc: "Start the AI-Agent server",
+            docs: "Launches the Model Context Protocol (MCP) JSON-RPC daemon over STDIO. Exposes tools like read_file, write_file, and list_directory natively to LLM agents.",
+            usage: "storage-bridge mcp",
+            script: [
+                { cmd: "storage-bridge mcp", out: "MCP Server running.\nWaiting for JSON-RPC payload..." },
+                { cmd: '{"jsonrpc": "2.0", "id": 1, "method": "tools/list"}', out: '{"jsonrpc":"2.0","id":1,"result":{"tools":[{"name":"read_file"},{"name":"write_file"},{"name":"list_directory"},{"name":"make_directory"},{"name":"move_file"}]}}' }
+            ]
+        }
     ];
 
+    const listEl = document.getElementById("cmd-list");
+    const docsEl = document.getElementById("docs-panel");
     const termBody = document.getElementById("term-body");
+    
     let isTyping = false;
+    let cancelType = false;
 
-    async function typeText(text, element) {
-        for (let i = 0; i < text.length; i++) {
-            element.textContent += text.charAt(i);
-            await new Promise(r => setTimeout(r, 30 + Math.random() * 40));
-        }
+    // Render Sidebar
+    commands.forEach((cmd, idx) => {
+        const item = document.createElement("div");
+        item.className = "cmd-item";
+        item.innerHTML = `<span class="cmd-name">${cmd.name}</span><span class="cmd-desc">${cmd.desc}</span>`;
+        item.onclick = () => selectCommand(idx);
+        listEl.appendChild(item);
+    });
+
+    async function selectCommand(index) {
+        if (isTyping) { cancelType = true; await new Promise(r => setTimeout(r, 100)); }
+        
+        document.querySelectorAll(".cmd-item").forEach((el, i) => {
+            el.className = (i === index) ? "cmd-item active" : "cmd-item";
+        });
+
+        const cmd = commands[index];
+        docsEl.innerHTML = `
+            <h3 style="color: hsl(var(--text-primary))">${cmd.name}</h3>
+            <p>${cmd.desc}</p>
+            <div class="code-block">${cmd.usage}</div>
+            <p>${cmd.docs}</p>
+        `;
+
+        runTerminalAnimation(cmd.script);
     }
 
-    async function startTyping() {
-        if (isTyping) return;
+    async function runTerminalAnimation(script) {
+        cancelType = false;
         isTyping = true;
         termBody.innerHTML = "";
 
         for (const line of script) {
+            if (cancelType) break;
+            
             const lineDiv = document.createElement("div");
             lineDiv.innerHTML = `<span class="prompt">$</span><span class="command"></span><span class="cursor"></span>`;
             termBody.appendChild(lineDiv);
@@ -186,29 +211,48 @@
             const cmdSpan = lineDiv.querySelector(".command");
             const cursor = lineDiv.querySelector(".cursor");
             
-            await typeText(line.cmd, cmdSpan);
+            // Type command
+            for (let i = 0; i < line.cmd.length; i++) {
+                if (cancelType) break;
+                cmdSpan.textContent += line.cmd.charAt(i);
+                await new Promise(r => setTimeout(r, 20 + Math.random() * 30));
+            }
+            if (cancelType) break;
             
             await new Promise(r => setTimeout(r, 200));
             cursor.remove();
 
+            // Show output
             if (line.out) {
                 const outDiv = document.createElement("div");
                 outDiv.className = "output";
-                outDiv.textContent = line.out;
+                
+                // Simulate output speed
                 termBody.appendChild(outDiv);
+                const lines = line.out.split('\n');
+                for (const ol of lines) {
+                    if (cancelType) break;
+                    outDiv.textContent += ol + '\n';
+                    termBody.scrollTop = termBody.scrollHeight;
+                    await new Promise(r => setTimeout(r, Math.min(200, ol.length * 5)));
+                }
             }
+            
             termBody.scrollTop = termBody.scrollHeight;
-            await new Promise(r => setTimeout(r, 800));
+            if (cancelType) break;
+            await new Promise(r => setTimeout(r, 600));
         }
 
-        const endDiv = document.createElement("div");
-        endDiv.innerHTML = `<span class="prompt">$</span><span class="cursor"></span>`;
-        termBody.appendChild(endDiv);
-        termBody.scrollTop = termBody.scrollHeight;
+        if (!cancelType) {
+            const endDiv = document.createElement("div");
+            endDiv.innerHTML = `<span class="prompt">$</span><span class="cursor"></span>`;
+            termBody.appendChild(endDiv);
+            termBody.scrollTop = termBody.scrollHeight;
+        }
+        
         isTyping = false;
+        cancelType = false;
     }
-
-    window.onload = () => setTimeout(startTyping, 500);
 </script>
 </body>
 </html>

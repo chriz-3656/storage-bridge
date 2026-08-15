@@ -3,104 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Storage Bridge | Multi-Cloud Architecture Engine</title>
+    <title>Storage Bridge | The Universal Cloud Filesystem</title>
     <meta name="description" content="A blazing-fast, AI-native CLI and Daemon that unites S3, Google Drive, Local, and more into a single unified filesystem.">
     <style>
         :root {
-            --bg-base: 228 10% 4%;
-            --bg-surface: 228 8% 8%;
-            --bg-elevated: 228 8% 12%;
-            --text-primary: 0 0% 98%;
-            --text-secondary: 228 10% 60%;
-            --accent: 210 100% 55%;
-            --accent-hover: 210 100% 65%;
-            --border-dim: 228 8% 16%;
-            --code-bg: 228 12% 6%;
-            
-            --spacing-sm: 0.5rem;
-            --spacing-md: 1rem;
-            --spacing-lg: 2rem;
-            --spacing-xl: 4rem;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-            
-            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --bg-base: 228 10% 4%; --bg-surface: 228 8% 8%; --bg-elevated: 228 8% 12%;
+            --text-primary: 0 0% 98%; --text-secondary: 228 10% 60%;
+            --accent: 210 100% 55%; --accent-hover: 210 100% 65%;
+            --border-dim: 228 8% 16%; --code-bg: 228 12% 6%;
+            --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 2rem; --spacing-xl: 4rem; --spacing-2xl: 8rem;
+            --radius-md: 8px; --radius-lg: 12px; --radius-xl: 24px;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: var(--font-sans);
-            background-color: hsl(var(--bg-base));
-            color: hsl(var(--text-primary));
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
+            font-family: var(--font-sans); background-color: hsl(var(--bg-base));
+            color: hsl(var(--text-primary)); line-height: 1.6;
+            -webkit-font-smoothing: antialiased; overflow-x: hidden;
         }
 
         /* Splash Screen */
         #splash {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100vh;
-            background: hsl(var(--bg-base));
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: hsl(var(--bg-base)); z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
             transition: opacity 0.8s ease-in-out, visibility 0.8s;
         }
-        
-        .splash-container {
-            position: relative;
-            width: 500px; height: 500px;
-        }
-        
+        .splash-container { position: relative; width: 500px; height: 500px; }
         .splash-center {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80px; height: 80px;
-            background: hsl(var(--accent));
-            border-radius: 20px;
-            display: flex; justify-content: center; align-items: center;
-            z-index: 10;
-            box-shadow: 0 0 40px hsla(var(--accent), 0.6);
-            animation: pulseLogo 2s infinite alternate;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 80px; height: 80px; background: hsl(var(--accent)); border-radius: 20px;
+            display: flex; justify-content: center; align-items: center; z-index: 10;
+            box-shadow: 0 0 40px hsla(var(--accent), 0.6); animation: pulseLogo 2s infinite alternate;
         }
         .splash-center svg { color: white; width: 40px; height: 40px; }
-
-        .node-container {
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 0; height: 0;
-        }
-
         .splash-node {
-            position: absolute;
-            width: 60px; height: 60px;
-            background: hsl(var(--bg-surface));
-            border: 2px solid hsl(var(--border-dim));
-            border-radius: 50%;
+            position: absolute; width: 60px; height: 60px; background: hsl(var(--bg-surface));
+            border: 2px solid hsl(var(--border-dim)); border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            z-index: 5;
+            transform: translate(-50%, -50%); opacity: 0; z-index: 5;
             box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
-        
         .splash-node svg { width: 30px; height: 30px; }
-        
         .connector-line {
-            position: absolute;
-            top: 50%; left: 50%;
-            height: 2px;
+            position: absolute; top: 50%; left: 50%; height: 2px;
             background: linear-gradient(90deg, hsl(var(--accent)), transparent);
-            transform-origin: left center;
-            width: 0;
-            opacity: 0;
-            z-index: 1;
+            transform-origin: left center; width: 0; opacity: 0; z-index: 1;
         }
-
         @keyframes pulseLogo {
             0% { transform: translate(-50%, -50%) scale(0.95); box-shadow: 0 0 20px hsla(var(--accent), 0.4); }
             100% { transform: translate(-50%, -50%) scale(1.05); box-shadow: 0 0 60px hsla(var(--accent), 0.8); }
@@ -108,62 +59,90 @@
 
         /* Typography & Layout */
         h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
-        h1 { font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: var(--spacing-md); font-weight: 700; }
-        h2 { font-size: clamp(1.75rem, 3vw, 2.5rem); margin-bottom: var(--spacing-lg); font-weight: 600; }
-        h3 { font-size: 1.25rem; margin-bottom: var(--spacing-sm); font-weight: 500; }
+        h1 { font-size: clamp(3rem, 6vw, 5rem); margin-bottom: var(--spacing-md); font-weight: 800; background: linear-gradient(180deg, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h2 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: var(--spacing-lg); font-weight: 700; text-align: center; }
+        h3 { font-size: 1.25rem; margin-bottom: var(--spacing-sm); font-weight: 600; }
         p { color: hsl(var(--text-secondary)); margin-bottom: var(--spacing-md); font-size: 1.1rem; }
         
         .container { max-width: 1200px; margin: 0 auto; padding: 0 var(--spacing-lg); }
+        .section { padding: var(--spacing-2xl) 0; }
         
         /* Nav */
         nav {
-            padding: var(--spacing-lg) 0;
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid hsl(var(--border-dim));
+            padding: var(--spacing-md) 0; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid hsla(var(--border-dim), 0.5);
+            position: sticky; top: 0; background: hsla(var(--bg-base), 0.8); backdrop-filter: blur(12px); z-index: 100;
         }
-        .logo { font-weight: 700; font-size: 1.25rem; display: flex; align-items: center; gap: var(--spacing-sm); }
+        .logo { font-weight: 700; font-size: 1.25rem; display: flex; align-items: center; gap: var(--spacing-sm); text-decoration: none; color: white; }
         .logo svg { width: 24px; height: 24px; color: hsl(var(--accent)); }
         
-        .nav-links { display: flex; gap: var(--spacing-lg); }
-        .nav-links a {
-            color: hsl(var(--text-secondary));
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
+        .nav-links { display: flex; gap: var(--spacing-lg); align-items: center; }
+        .nav-links a { color: hsl(var(--text-secondary)); text-decoration: none; font-size: 0.95rem; font-weight: 500; transition: color 0.2s; }
         .nav-links a:hover, .nav-links a.active { color: hsl(var(--text-primary)); }
 
-        /* Hero */
-        .hero { padding: calc(var(--spacing-xl) * 1.5) 0; text-align: center; }
-        .hero-subtitle { max-width: 600px; margin: 0 auto var(--spacing-lg); }
+        /* Buttons */
         .button {
-            display: inline-flex; align-items: center; gap: 8px;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
             background: hsl(var(--text-primary)); color: hsl(var(--bg-base));
-            padding: 12px 24px; border-radius: var(--radius-md); font-weight: 600;
-            text-decoration: none; transition: transform 0.2s, opacity 0.2s; border: none;
+            padding: 14px 28px; border-radius: var(--radius-md); font-weight: 600;
+            text-decoration: none; transition: transform 0.2s, box-shadow 0.2s; border: none; cursor: pointer;
         }
-        .button:hover { transform: translateY(-2px); opacity: 0.9; }
-        .button-secondary { background: hsl(var(--bg-elevated)); color: hsl(var(--text-primary)); border: 1px solid hsl(var(--border-dim)); }
-        .button-secondary:hover { background: hsl(var(--bg-surface)); }
-        .button-group { display: flex; gap: var(--spacing-md); justify-content: center; }
+        .button:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,255,255,0.15); }
+        .button-secondary { background: hsl(var(--bg-elevated)); color: hsl(var(--text-primary)); border: 1px solid hsl(var(--border-dim)); box-shadow: none; }
+        .button-secondary:hover { background: hsl(var(--bg-surface)); box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+        
+        /* Hero */
+        .hero { text-align: center; padding-top: var(--spacing-2xl); padding-bottom: var(--spacing-xl); }
+        .hero-subtitle { max-width: 650px; margin: 0 auto var(--spacing-lg); font-size: 1.25rem; }
+        .hero-cta { display: flex; gap: var(--spacing-md); justify-content: center; margin-bottom: var(--spacing-2xl); }
+        
+        .hero-mockup {
+            max-width: 900px; margin: 0 auto;
+            border-radius: var(--radius-xl);
+            background: hsl(var(--bg-surface));
+            border: 1px solid hsl(var(--border-dim));
+            box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+            overflow: hidden;
+            position: relative;
+        }
+        .hero-mockup-header { background: hsl(var(--bg-elevated)); padding: 12px 20px; display: flex; gap: 8px; border-bottom: 1px solid hsl(var(--border-dim)); }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.r { background: #FF5F56; } .dot.y { background: #FFBD2E; } .dot.g { background: #27C93F; }
+        .hero-mockup-body { padding: 32px; font-family: var(--font-mono); text-align: left; color: #A8B2D1; font-size: 0.95rem; line-height: 1.5; }
+
+        /* Integrations / Logos */
+        .integrations { text-align: center; padding: var(--spacing-xl) 0; border-top: 1px solid hsl(var(--border-dim)); border-bottom: 1px solid hsl(var(--border-dim)); background: hsla(var(--bg-surface), 0.3); }
+        .integrations p { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; margin-bottom: var(--spacing-lg); }
+        .logo-cloud { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; opacity: 0.7; }
+        .logo-cloud svg { width: 40px; height: 40px; transition: transform 0.2s, opacity 0.2s; }
+        .logo-cloud svg:hover { transform: scale(1.1); opacity: 1; }
 
         /* Features */
-        .features { padding: var(--spacing-xl) 0; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-lg); }
-        .card {
-            background: hsl(var(--bg-surface)); border: 1px solid hsl(var(--border-dim));
-            border-radius: var(--radius-lg); padding: var(--spacing-lg);
-            transition: transform 0.2s, border-color 0.2s;
-        }
+        .features .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--spacing-lg); margin-top: var(--spacing-xl); }
+        .card { background: hsl(var(--bg-surface)); border: 1px solid hsl(var(--border-dim)); border-radius: var(--radius-lg); padding: var(--spacing-lg); transition: transform 0.2s, border-color 0.2s; }
         .card:hover { transform: translateY(-4px); border-color: hsl(var(--text-secondary)); }
-        .card-icon {
-            width: 40px; height: 40px; background: hsl(var(--bg-elevated));
-            border-radius: var(--radius-md); display: flex; align-items: center;
-            justify-content: center; margin-bottom: var(--spacing-md); color: hsl(var(--accent));
-        }
+        .card-icon { width: 48px; height: 48px; background: hsl(var(--bg-elevated)); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin-bottom: var(--spacing-md); color: hsl(var(--accent)); }
+        .card-icon svg { width: 24px; height: 24px; }
 
-        footer { padding: var(--spacing-xl) 0; border-top: 1px solid hsl(var(--border-dim)); text-align: center; color: hsl(var(--text-secondary)); }
+        /* Use Cases / Code Preview */
+        .use-cases { background: hsl(var(--bg-surface)); border-top: 1px solid hsl(var(--border-dim)); border-bottom: 1px solid hsl(var(--border-dim)); }
+        .split-section { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-xl); align-items: center; }
+        @media (max-width: 900px) { .split-section { grid-template-columns: 1fr; } }
+        
+        .code-window { background: #000; border-radius: var(--radius-md); border: 1px solid hsl(var(--border-dim)); padding: var(--spacing-md); font-family: var(--font-mono); font-size: 0.9rem; overflow-x: auto; }
+        .code-window .prompt { color: hsl(var(--accent)); }
+        .code-window .cmd { color: #fff; }
+        .code-window .comment { color: hsl(var(--text-secondary)); }
+
+        /* About Developer */
+        .about { text-align: center; }
+        .developer-profile { display: inline-block; text-align: left; background: hsl(var(--bg-surface)); border: 1px solid hsl(var(--border-dim)); padding: var(--spacing-lg); border-radius: var(--radius-lg); margin-top: var(--spacing-lg); max-width: 600px; }
+        .developer-header { display: flex; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-md); }
+        .avatar { width: 64px; height: 64px; border-radius: 50%; background: hsl(var(--accent)); display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 1.5rem; color: white; }
+        .dev-tags { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+        .tag { background: hsl(var(--bg-elevated)); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; border: 1px solid hsl(var(--border-dim)); }
+
+        footer { padding: var(--spacing-xl) 0; text-align: center; color: hsl(var(--text-secondary)); border-top: 1px solid hsl(var(--border-dim)); margin-top: var(--spacing-2xl); }
     </style>
 </head>
 <body>
@@ -171,116 +150,173 @@
 <!-- SPLASH SCREEN -->
 <div id="splash">
     <div class="splash-container" id="splash-container">
-        <!-- Main Logo -->
         <div class="splash-center">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
         </div>
-        <!-- Connectors & Nodes generated by JS -->
     </div>
 </div>
 
-<div class="container">
-    <nav>
-        <div class="logo">
+<nav>
+    <div class="container" style="display: flex; justify-content: space-between; width: 100%;">
+        <a href="index.html" class="logo">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
             Storage Bridge
-        </div>
+        </a>
         <div class="nav-links">
-            <a href="index.html" class="active">Overview</a>
-            <a href="docs.html">Documentation</a>
-            <a href="terminal.html">Virtual Terminal</a>
-            <a href="https://github.com/chriz-3656/storage-bridge" target="_blank">GitHub</a>
+            <a href="index.html" class="active">Product</a>
+            <a href="terminal.html">Interactive Terminal</a>
+            <a href="docs.html">Docs</a>
+            <a href="#developer">About</a>
+            <a href="https://github.com/chriz-3656/storage-bridge" target="_blank" class="button button-secondary" style="padding: 8px 16px;">GitHub</a>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <header class="hero">
-        <h1>The Universal Cloud Filesystem</h1>
-        <p class="hero-subtitle">A blazing-fast, AI-native CLI and Daemon that unites S3, Google Drive, Local, and more into a single seamless architecture.</p>
-        <div class="button-group">
-            <a href="docs.html" class="button">Read Documentation</a>
-            <a href="terminal.html" class="button button-secondary">Try Virtual Terminal</a>
+<div class="container hero">
+    <h1>The OS for the Cloud</h1>
+    <p class="hero-subtitle">Storage Bridge is a blazing-fast, AI-native CLI and daemon that unites AWS S3, Google Drive, and your local filesystem into a single, scriptable operating layer.</p>
+    
+    <div class="hero-cta">
+        <a href="terminal.html" class="button">Try the Virtual Terminal</a>
+        <a href="docs.html" class="button button-secondary">Read Documentation</a>
+    </div>
+
+    <div class="hero-mockup">
+        <div class="hero-mockup-header">
+            <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
         </div>
-    </header>
-
-    <section class="features">
-        <div class="grid">
-            <div class="card">
-                <div class="card-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline><polyline points="7.5 19.79 7.5 14.6 3 12"></polyline><polyline points="21 12 16.5 14.6 16.5 19.79"></polyline></svg>
-                </div>
-                <h3>Union Load Balancing</h3>
-                <p>Merge multiple cloud providers into a single virtual pool. Dynamically route uploads via 'first' available or 'all' mirroring policies.</p>
-            </div>
-            
-            <div class="card">
-                <div class="card-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                </div>
-                <h3>Parallel Sync Engine</h3>
-                <p>High-performance, concurrent differential sync. Builds an in-memory diff map and transfers only modified files using GoRoutines.</p>
-            </div>
-
-            <div class="card">
-                <div class="card-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
-                </div>
-                <h3>AI-Native MCP Server</h3>
-                <p>Built-in JSON-RPC server implementing the Model Context Protocol. Empower LLM agents to natively manage your files without complex APIs.</p>
-            </div>
-
-            <div class="card">
-                <div class="card-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                </div>
-                <h3>Universal Compatibility</h3>
-                <p>Native connectors for Google Drive, Local FS, Amazon S3, Cloudflare R2, Backblaze B2, and DigitalOcean Spaces via custom endpoints.</p>
-            </div>
+        <div class="hero-mockup-body">
+            <span class="prompt">user@engine:~$</span> <span class="cmd">storage-bridge provider add hybrid --type union --upstreams local,s3 --policy first</span><br>
+            <span style="color: #27C93F;">✓ Successfully added union provider 'hybrid'</span><br><br>
+            <span class="prompt">user@engine:~$</span> <span class="cmd">storage-bridge sync local:./data hybrid:/backups --workers 8</span><br>
+            Building destination file list for hybrid:/backups...<br>
+            Building source file list for local:./data...<br>
+            [Worker 1] Syncing data/analytics.csv → backups/analytics.csv<br>
+            [Worker 2] Syncing data/logs.tar.gz → backups/logs.tar.gz<br>
+            <span style="color: #27C93F;">Sync completed successfully in 1.2s.</span>
         </div>
-    </section>
-
-    <footer>
-        <p>&copy; 2026 Storage Bridge. Open-Source Multi-Cloud Architecture.</p>
-    </footer>
+    </div>
 </div>
 
+<section class="integrations">
+    <div class="container">
+        <p>Natively Integrates With</p>
+        <div class="logo-cloud" id="logo-cloud">
+            <!-- Populated via JS to reuse SVGs -->
+        </div>
+    </div>
+</section>
+
+<section class="section features container">
+    <h2>Enterprise-Grade Architecture</h2>
+    <div class="grid">
+        <div class="card">
+            <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline><polyline points="7.5 19.79 7.5 14.6 3 12"></polyline><polyline points="21 12 16.5 14.6 16.5 19.79"></polyline></svg></div>
+            <h3>Union Load Balancing</h3>
+            <p>Combine unlimited cloud providers into a single virtual pool. Route uploads dynamically using customizable load-balancing policies.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg></div>
+            <h3>Parallel Sync Engine</h3>
+            <p>Stop waiting on sequential uploads. Our GoRoutine-powered sync engine calculates in-memory diffs and transfers data in highly concurrent streams.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg></div>
+            <h3>AI-Native MCP Server</h3>
+            <p>The first cloud tool built for agents. Exposes a local JSON-RPC server implementing the Model Context Protocol, allowing Claude or Antigravity to manage files.</p>
+        </div>
+    </div>
+</section>
+
+<section class="section use-cases">
+    <div class="container split-section">
+        <div>
+            <h2>Stateful CLI Navigation</h2>
+            <p>Unlike traditional CLI tools that require entering long <code>s3://</code> or <code>drive://</code> URLs for every single command, Storage Bridge maintains a stateful connection context.</p>
+            <p>You can <code>cd</code> directly into a cloud folder, and every subsequent <code>mkdir</code>, <code>upload</code>, and <code>list</code> command will execute inside that exact cloud directory.</p>
+        </div>
+        <div class="code-window">
+            <span class="comment"># Connect to your google drive</span><br>
+            <span class="prompt">$</span> <span class="cmd">storage-bridge auth login google</span><br><br>
+            <span class="comment"># Traverse the cloud like a local OS</span><br>
+            <span class="prompt">$</span> <span class="cmd">storage-bridge cd /Backups/Production</span><br>
+            <span class="prompt">$</span> <span class="cmd">storage-bridge pwd</span><br>
+            google:/Backups/Production<br><br>
+            <span class="comment"># Uploads automatically target the active folder</span><br>
+            <span class="prompt">$</span> <span class="cmd">storage-bridge upload latest_db.sql</span>
+        </div>
+    </div>
+</section>
+
+<section id="developer" class="section about container">
+    <h2>Built By</h2>
+    <div class="developer-profile">
+        <div class="developer-header">
+            <div class="avatar">C</div>
+            <div>
+                <h3 style="margin:0;">Chris Mon Saji <span style="color:hsl(var(--text-secondary)); font-weight:400;">(Chriz)</span></h3>
+                <p style="margin:0; font-size:0.9rem;">India • Software Developer & Open Source Creator</p>
+            </div>
+        </div>
+        <p>Founder of <strong>Sky Realms SMP</strong> and creator of <strong>ReconAssistant</strong> & <strong>CHRIZ-AI-Platform</strong>. Passionate about building high-performance CLI tools, open-source security applications, and pushing the boundaries of AI integration.</p>
+        <div class="dev-tags">
+            <span class="tag">Go (Golang)</span>
+            <span class="tag">Cloud Architecture</span>
+            <span class="tag">Cybersecurity</span>
+            <span class="tag">AI Agents (MCP)</span>
+        </div>
+        <div style="margin-top: 20px;">
+            <a href="https://github.com/chriz-3656" target="_blank" class="button button-secondary" style="font-size: 0.9rem; padding: 6px 12px;">View GitHub Profile</a>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2026 Storage Bridge. Open-Source Multi-Cloud Architecture.</p>
+    </div>
+</footer>
+
 <script>
-    // Providers to animate in splash screen
-    const providers = [
-        { name: "Drive", color: "#1FA463", path: "M12.01 1.485c-2.082 0-3.754.02-3.743.047.01.02 1.708 3.001 3.774 6.62l3.76 6.574h3.76c2.081 0 3.753-.02 3.742-.047-.005-.02-1.708-3.001-3.775-6.62l-3.76-6.574zm-4.76 1.73a789.828 789.861 0 0 0-3.63 6.319L0 15.868l1.89 3.298 1.885 3.297 3.62-6.335 3.618-6.33-1.88-3.287C8.1 4.704 7.255 3.22 7.25 3.214zm2.259 12.653-.203.348c-.114.198-.96 1.672-1.88 3.287a423.93 423.948 0 0 1-1.698 2.97c-.01.026 3.24.042 7.222.042h7.244l1.796-3.157c.992-1.734 1.85-3.23 1.906-3.323l.104-.167h-7.249z" }, // Google Drive Official
-        { name: "Cloudflare", color: "#F38020", path: "M16.5088 16.8447c.1475-.5068.0908-.9707-.1553-1.3154-.2246-.3164-.6045-.499-1.0615-.5205l-8.6592-.1123a.1559.1559 0 0 1-.1333-.0713c-.0283-.042-.0351-.0986-.021-.1553.0278-.084.1123-.1484.2036-.1562l8.7359-.1123c1.0351-.0489 2.1601-.8868 2.5537-1.9136l.499-1.3013c.0215-.0561.0293-.1128.0147-.168-.5625-2.5463-2.835-4.4453-5.5499-4.4453-2.5039 0-4.6284 1.6177-5.3876 3.8614-.4927-.3658-1.1187-.5625-1.794-.499-1.2026.119-2.1665 1.083-2.2861 2.2856-.0283.31-.0069.6128.0635.894C1.5683 13.171 0 14.7754 0 16.752c0 .1748.0142.3515.0352.5273.0141.083.0844.1475.1689.1475h15.9814c.0909 0 .1758-.0645.2032-.1553l.12-.4268zm2.7568-5.5634c-.0771 0-.1611 0-.2383.0112-.0566 0-.1054.0415-.127.0976l-.3378 1.1744c-.1475.5068-.0918.9707.1543 1.3164.2256.3164.6055.498 1.0625.5195l1.8437.1133c.0557 0 .1055.0263.1329.0703.0283.043.0351.1074.0214.1562-.0283.084-.1132.1485-.204.1553l-1.921.1123c-1.041.0488-2.1582.8867-2.5527 1.914l-.1406.3585c-.0283.0713.0215.1416.0986.1416h6.5977c.0771 0 .1474-.0489.169-.126.1122-.4082.1757-.837.1757-1.2803 0-2.6025-2.125-4.727-4.7344-4.727" }, // Cloudflare Official
-        { name: "Dropbox", color: "#0061FF", path: "M6 1.807L0 5.629l6 3.822 6.001-3.822L6 1.807zM18 1.807l-6 3.822 6 3.822 6-3.822-6-3.822zM0 13.274l6 3.822 6.001-3.822L6 9.452l-6 3.822zM18 9.452l-6 3.822 6 3.822 6-3.822-6-3.822zM6 18.371l6.001 3.822 6-3.822-6-3.822L6 18.371z" }, // Dropbox Official
-        { name: "Backblaze", color: "#E21E29", path: "M9.3108.0003c.6527 1.3502 1.5666 4.0812-1.3887 7.1738-1.8096 1.8796-3.078 3.8487-2.3496 6.0644.3642 1.1037 1.1864 2.5079 2.8867 2.7852.6107.1008 1.3425-.0006 1.7403-.1406 2.4538-.8544 2.098-3.4138 1.5546-5.0469-.07-.2129-.1915-.7333-.2363-.9238-.3726-1.6023.776-2.6562 1.129-3.8047.028-.0925.0534-.1819.0702-.2715.042-.21.067-.423.0781-.6387 0-1.8264-.9882-2.6303-1.7754-3.5996C10.1794.5643 9.3107.0003 9.3107.0003Zm6.2754 6.0175s-.709.3366-1.2188.8829c-.4454.4818-.8635.8789-1.2949 1.8593-.028.14-.0518.2863-.0742.4375-.2325 1.6416 1.1473 3.1446.7187 5.1895-.112.535-.3554.7123-.7812 1.6367-.5098 1.1065-.383 2.588.3594 3.5293.6723.8488 1.879 1.2321 3.0527.9492 2.1065-.5042 3.0646-2.2822 2.8965-4.2851-.1317-1.58-.8154-2.7536-2.754-4.961-.9607-1.0925-1.6072-2.409-1.5624-3.4062.1373-1.2074.6582-1.832.6582-1.832zM4.8928 15.1936c-.0222.0145-.0439.0614-.0586.1602a.0469.0469 0 0 1-.0059.0195v.01c-.1148.5406-.1649 1.823.1153 2.9687.353 1.4427 1.4175 3.902 4.412 5.129 2.5184 1.0336 5.718.5411 7.8497-1.627.5294-.5435.408-.4897-.4883-.2012v-.002c-1.1121.3558-3.5182.5463-4.7676-1-1.5239-1.8852-.4302-3.3633-1.3574-3.1504-3.6164.8348-5.2667-1.4657-5.5469-2.1016-.0023-.002-.0857-.2487-.1523-.205z" }, // Backblaze Official
-        { name: "S3", color: "#FF9900", path: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z" } // AWS Generic Fill
+    const providerSVGs = [
+        { name: "Drive", color: "#1FA463", path: "M12.01 1.485c-2.082 0-3.754.02-3.743.047.01.02 1.708 3.001 3.774 6.62l3.76 6.574h3.76c2.081 0 3.753-.02 3.742-.047-.005-.02-1.708-3.001-3.775-6.62l-3.76-6.574zm-4.76 1.73a789.828 789.861 0 0 0-3.63 6.319L0 15.868l1.89 3.298 1.885 3.297 3.62-6.335 3.618-6.33-1.88-3.287C8.1 4.704 7.255 3.22 7.25 3.214zm2.259 12.653-.203.348c-.114.198-.96 1.672-1.88 3.287a423.93 423.948 0 0 1-1.698 2.97c-.01.026 3.24.042 7.222.042h7.244l1.796-3.157c.992-1.734 1.85-3.23 1.906-3.323l.104-.167h-7.249z" },
+        { name: "Cloudflare", color: "#F38020", path: "M16.5088 16.8447c.1475-.5068.0908-.9707-.1553-1.3154-.2246-.3164-.6045-.499-1.0615-.5205l-8.6592-.1123a.1559.1559 0 0 1-.1333-.0713c-.0283-.042-.0351-.0986-.021-.1553.0278-.084.1123-.1484.2036-.1562l8.7359-.1123c1.0351-.0489 2.1601-.8868 2.5537-1.9136l.499-1.3013c.0215-.0561.0293-.1128.0147-.168-.5625-2.5463-2.835-4.4453-5.5499-4.4453-2.5039 0-4.6284 1.6177-5.3876 3.8614-.4927-.3658-1.1187-.5625-1.794-.499-1.2026.119-2.1665 1.083-2.2861 2.2856-.0283.31-.0069.6128.0635.894C1.5683 13.171 0 14.7754 0 16.752c0 .1748.0142.3515.0352.5273.0141.083.0844.1475.1689.1475h15.9814c.0909 0 .1758-.0645.2032-.1553l.12-.4268zm2.7568-5.5634c-.0771 0-.1611 0-.2383.0112-.0566 0-.1054.0415-.127.0976l-.3378 1.1744c-.1475.5068-.0918.9707.1543 1.3164.2256.3164.6055.498 1.0625.5195l1.8437.1133c.0557 0 .1055.0263.1329.0703.0283.043.0351.1074.0214.1562-.0283.084-.1132.1485-.204.1553l-1.921.1123c-1.041.0488-2.1582.8867-2.5527 1.914l-.1406.3585c-.0283.0713.0215.1416.0986.1416h6.5977c.0771 0 .1474-.0489.169-.126.1122-.4082.1757-.837.1757-1.2803 0-2.6025-2.125-4.727-4.7344-4.727" },
+        { name: "Dropbox", color: "#0061FF", path: "M6 1.807L0 5.629l6 3.822 6.001-3.822L6 1.807zM18 1.807l-6 3.822 6 3.822 6-3.822-6-3.822zM0 13.274l6 3.822 6.001-3.822L6 9.452l-6 3.822zM18 9.452l-6 3.822 6 3.822 6-3.822-6-3.822zM6 18.371l6.001 3.822 6-3.822-6-3.822L6 18.371z" },
+        { name: "Backblaze", color: "#E21E29", path: "M9.3108.0003c.6527 1.3502 1.5666 4.0812-1.3887 7.1738-1.8096 1.8796-3.078 3.8487-2.3496 6.0644.3642 1.1037 1.1864 2.5079 2.8867 2.7852.6107.1008 1.3425-.0006 1.7403-.1406 2.4538-.8544 2.098-3.4138 1.5546-5.0469-.07-.2129-.1915-.7333-.2363-.9238-.3726-1.6023.776-2.6562 1.129-3.8047.028-.0925.0534-.1819.0702-.2715.042-.21.067-.423.0781-.6387 0-1.8264-.9882-2.6303-1.7754-3.5996C10.1794.5643 9.3107.0003 9.3107.0003Zm6.2754 6.0175s-.709.3366-1.2188.8829c-.4454.4818-.8635.8789-1.2949 1.8593-.028.14-.0518.2863-.0742.4375-.2325 1.6416 1.1473 3.1446.7187 5.1895-.112.535-.3554.7123-.7812 1.6367-.5098 1.1065-.383 2.588.3594 3.5293.6723.8488 1.879 1.2321 3.0527.9492 2.1065-.5042 3.0646-2.2822 2.8965-4.2851-.1317-1.58-.8154-2.7536-2.754-4.961-.9607-1.0925-1.6072-2.409-1.5624-3.4062.1373-1.2074.6582-1.832.6582-1.832zM4.8928 15.1936c-.0222.0145-.0439.0614-.0586.1602a.0469.0469 0 0 1-.0059.0195v.01c-.1148.5406-.1649 1.823.1153 2.9687.353 1.4427 1.4175 3.902 4.412 5.129 2.5184 1.0336 5.718.5411 7.8497-1.627.5294-.5435.408-.4897-.4883-.2012v-.002c-1.1121.3558-3.5182.5463-4.7676-1-1.5239-1.8852-.4302-3.3633-1.3574-3.1504-3.6164.8348-5.2667-1.4657-5.5469-2.1016-.0023-.002-.0857-.2487-.1523-.205z" },
+        { name: "S3", color: "#FF9900", path: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z" }
     ];
 
     document.addEventListener("DOMContentLoaded", () => {
+        // Populate logos in integration section
+        const cloud = document.getElementById("logo-cloud");
+        providerSVGs.forEach(p => {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${p.color}" title="${p.name}"><path d="${p.path}"></path></svg>`;
+            cloud.innerHTML += svg;
+        });
+
+        // Splash screen animation
         const splashContainer = document.getElementById("splash-container");
         const radius = 160;
-        const total = providers.length;
+        const total = providerSVGs.length;
 
-        providers.forEach((prov, i) => {
+        providerSVGs.forEach((prov, i) => {
             const angle = (i * (360 / total) - 90) * (Math.PI / 180);
             const x = Math.cos(angle) * radius;
             const y = Math.sin(angle) * radius;
 
-            // Create connector line container
             const connector = document.createElement("div");
             connector.className = "connector-line";
-            
-            // Calculate angle for line
             const lineAngle = Math.atan2(y, x) * (180 / Math.PI);
             connector.style.transform = `translate(0, 0) rotate(${lineAngle}deg)`;
             splashContainer.appendChild(connector);
 
-            // Create Node
             const node = document.createElement("div");
             node.className = "splash-node";
             node.style.left = `calc(50% + ${x}px)`;
             node.style.top = `calc(50% + ${y}px)`;
-            node.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="${prov.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${prov.path}"></path></svg>`;
+            node.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${prov.color}"><path d="${prov.path}"></path></svg>`;
             splashContainer.appendChild(node);
 
-            // Animation sequence
             setTimeout(() => {
                 connector.style.transition = "width 0.4s ease-out, opacity 0.4s";
                 connector.style.width = `${radius}px`;
@@ -294,13 +330,10 @@
             }, 500 + (i * 200));
         });
 
-        // Hide splash screen after sequence finishes
         setTimeout(() => {
             const splash = document.getElementById("splash");
             splash.style.opacity = "0";
-            setTimeout(() => {
-                splash.style.visibility = "hidden";
-            }, 800);
+            setTimeout(() => splash.style.visibility = "hidden", 800);
         }, 3200);
     });
 </script>
