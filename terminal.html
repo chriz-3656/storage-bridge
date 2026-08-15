@@ -57,20 +57,32 @@
         .output { color: #A8B2D1; margin: 8px 0 20px 0; white-space: pre-wrap; line-height: 1.5; }
         .cursor { display: inline-block; width: 10px; height: 18px; background: #FFF; animation: blink 1s step-end infinite; vertical-align: text-bottom; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            nav { flex-direction: column; gap: var(--spacing-md); }
+            .nav-links { flex-wrap: wrap; justify-content: center; gap: var(--spacing-md); }
+            .nav-links a { text-align: center; }
+            .layout { flex-direction: column; overflow-y: auto; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid hsl(var(--border-dim)); }
+            .docs-panel { min-height: 200px; }
+            .main-content { min-height: 400px; padding: var(--spacing-md); }
+        }
     </style>
 </head>
 <body>
 
-<nav>
-    <a href="index.html" class="logo">
+<nav style="display: flex; justify-content: space-between; width: 100%; align-items: center; flex-wrap: wrap;">
+    <a href="index.html" class="logo" style="margin-bottom: 5px;">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
         Storage Bridge
     </a>
     <div class="nav-links">
         <a href="index.html">Product</a>
+        <a href="download.html">Download</a>
         <a href="terminal.html" class="active">Interactive Terminal</a>
         <a href="docs.html">Docs</a>
-        <a href="index.html#developer">About</a>
+        <a href="https://github.com/chriz-3656/storage-bridge" target="_blank" style="padding: 8px 16px; border: 1px solid hsl(var(--border-dim)); border-radius: 8px;">GitHub</a>
     </div>
 </nav>
 
