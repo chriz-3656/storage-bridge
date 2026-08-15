@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storage Bridge | Cinematic Demo</title>
+    <style>
+        :root {
+            --bg-base: 228 10% 4%; --bg-surface: 228 8% 8%; --bg-elevated: 228 8% 12%;
+            --text-primary: 0 0% 98%; --text-secondary: 228 10% 60%;
+            --accent: 210 100% 55%; --accent-glow: hsla(210, 100%, 55%, 0.5);
+            --font-sans: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+            --font-mono: "SFMono-Regular", Consolas, monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-sans); background: hsl(var(--bg-base));
+            color: hsl(var(--text-primary)); overflow: hidden; height: 100vh; width: 100vw;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* Scene Management */
+        .scene {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; visibility: hidden; transition: opacity 1s ease-in-out, visibility 1s;
+        }
+        .scene.active { opacity: 1; visibility: visible; }
+
+        /* Typography */
+        h1 { font-size: 5rem; font-weight: 800; letter-spacing: -2px; margin-bottom: 20px; text-align: center; background: linear-gradient(180deg, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h2 { font-size: 3.5rem; font-weight: 700; letter-spacing: -1px; text-align: center; }
+        p { font-size: 1.5rem; color: hsl(var(--text-secondary)); text-align: center; max-width: 800px; line-height: 1.5; }
+
+        /* --- Scene 1: Logo Intro --- */
+        .logo-container {
+            width: 120px; height: 120px; background: hsl(var(--accent)); border-radius: 30px;
+            display: flex; justify-content: center; align-items: center; margin-bottom: 40px;
+            box-shadow: 0 0 60px var(--accent-glow); animation: pulse 2s infinite alternate;
+        }
+        .logo-container svg { width: 60px; height: 60px; color: white; }
+        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 40px var(--accent-glow); } 100% { transform: scale(1.05); box-shadow: 0 0 100px var(--accent-glow); } }
+        
+        .fade-up { transform: translateY(40px); opacity: 0; transition: all 1.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        .scene.active .fade-up { transform: translateY(0); opacity: 1; }
+
+        /* --- Scene 2: Union Architecture --- */
+        .network { position: relative; width: 800px; height: 400px; display: flex; justify-content: center; align-items: center; margin-top: 40px; }
+        .node {
+            position: absolute; width: 80px; height: 80px; background: hsl(var(--bg-surface));
+            border: 2px solid hsl(var(--border-dim)); border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            z-index: 10; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: scale(0); transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .node svg { width: 40px; height: 40px; }
+        .node.center { width: 120px; height: 120px; background: hsl(var(--accent)); border: none; box-shadow: 0 0 50px var(--accent-glow); }
+        .node.center svg { width: 60px; height: 60px; color: white; }
+        .scene.active .node { transform: scale(1); }
+
+        .line {
+            position: absolute; top: 50%; left: 50%; height: 3px; background: linear-gradient(90deg, hsl(var(--accent)), transparent);
+            transform-origin: left center; width: 0; z-index: 1; transition: width 1s ease-out; opacity: 0;
+        }
+        .scene.active .line { opacity: 1; }
+
+        /* --- Scene 3: Terminal Sync --- */
+        .term-container {
+            width: 1000px; height: 600px; background: #000; border-radius: 16px; border: 1px solid hsl(var(--border-dim));
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8); display: flex; flex-direction: column; overflow: hidden;
+            transform: scale(0.9) translateY(50px); opacity: 0; transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .scene.active .term-container { transform: scale(1) translateY(0); opacity: 1; }
+        .term-header { background: hsl(var(--bg-elevated)); padding: 16px 24px; display: flex; gap: 8px; border-bottom: 1px solid hsl(var(--border-dim)); }
+        .term-dot { width: 14px; height: 14px; border-radius: 50%; }
+        .term-body { padding: 32px; font-family: var(--font-mono); font-size: 1.3rem; color: #A8B2D1; line-height: 1.6; flex: 1; display: flex; flex-direction: column; justify-content: flex-end; }
+        .prompt { color: hsl(var(--accent)); margin-right: 12px; }
+        .cmd-text { color: #FFF; }
+        .cursor { display: inline-block; width: 12px; height: 24px; background: #FFF; animation: blink 1s step-end infinite; vertical-align: text-bottom; }
+
+        /* --- Scene 4: AI MCP --- */
+        .ai-chat {
+            background: hsl(var(--bg-elevated)); border: 1px solid hsl(var(--border-dim));
+            padding: 30px; border-radius: 20px 20px 20px 4px; max-width: 600px; margin-bottom: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); transform: translateX(-50px); opacity: 0; transition: all 1s;
+        }
+        .ai-chat p { color: white; font-size: 1.8rem; text-align: left; }
+        .scene.active .ai-chat { transform: translateX(0); opacity: 1; }
+        
+        .json-block {
+            background: #000; padding: 24px; border-radius: 12px; border: 1px solid hsla(var(--accent), 0.5);
+            font-family: var(--font-mono); color: #27C93F; font-size: 1.4rem; box-shadow: 0 0 40px hsla(210,100%,55%,0.2);
+            transform: translateX(50px); opacity: 0; transition: all 1s 0.5s;
+        }
+        .scene.active .json-block { transform: translateX(0); opacity: 1; }
+
+        /* --- Scene 5: Outro --- */
+        .outro-text { transition-delay: 0.5s; }
+        .btn-play { position: fixed; bottom: 40px; right: 40px; background: white; color: black; padding: 15px 30px; font-size: 1.2rem; font-weight: bold; border-radius: 30px; border: none; cursor: pointer; z-index: 10000; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .btn-play:hover { transform: scale(1.05); }
+
+    </style>
+</head>
+<body>
+
+    <!-- Play Button (Hidden during recording) -->
+    <button class="btn-play" id="playBtn" onclick="startCinematic()">Play Sequence</button>
+
+    <!-- Scene 1: Intro -->
+    <div class="scene" id="scene1">
+        <div class="logo-container fade-up">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
+        </div>
+        <h1 class="fade-up" style="transition-delay: 0.2s">Storage Bridge</h1>
+        <p class="fade-up" style="transition-delay: 0.4s">The Universal Cloud Operating System</p>
+    </div>
+
+    <!-- Scene 2: Union Architecture -->
+    <div class="scene" id="scene2">
+        <h2>Unite Your Clouds</h2>
+        <p style="margin-top:20px;">Merge S3, Google Drive, and Local Storage into one load-balanced virtual pool.</p>
+        <div class="network">
+            <!-- Center -->
+            <div class="node center" style="transition-delay: 0.5s">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+            </div>
+            
+            <!-- Drive -->
+            <div class="line" id="line1" style="transform: rotate(210deg)"></div>
+            <div class="node" style="left: calc(50% - 240px); top: calc(50% - 140px); transition-delay: 1.5s">
+                <svg viewBox="0 0 24 24" fill="#1FA463"><path d="M12.01 1.485c-2.082 0-3.754.02-3.743.047.01.02 1.708 3.001 3.774 6.62l3.76 6.574h3.76c2.081 0 3.753-.02 3.742-.047-.005-.02-1.708-3.001-3.775-6.62l-3.76-6.574zm-4.76 1.73a789.828 789.861 0 0 0-3.63 6.319L0 15.868l1.89 3.298 1.885 3.297 3.62-6.335 3.618-6.33-1.88-3.287C8.1 4.704 7.255 3.22 7.25 3.214zm2.259 12.653-.203.348c-.114.198-.96 1.672-1.88 3.287a423.93 423.948 0 0 1-1.698 2.97c-.01.026 3.24.042 7.222.042h7.244l1.796-3.157c.992-1.734 1.85-3.23 1.906-3.323l.104-.167h-7.249z"/></svg>
+            </div>
+            
+            <!-- S3 -->
+            <div class="line" id="line2" style="transform: rotate(330deg)"></div>
+            <div class="node" style="left: calc(50% + 160px); top: calc(50% - 140px); transition-delay: 1.8s">
+                <svg viewBox="0 0 24 24" fill="#FF9900"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
+            </div>
+
+            <!-- Cloudflare -->
+            <div class="line" id="line3" style="transform: rotate(90deg)"></div>
+            <div class="node" style="left: calc(50% - 40px); top: calc(50% + 160px); transition-delay: 2.1s">
+                <svg viewBox="0 0 24 24" fill="#F38020"><path d="M16.5088 16.8447c.1475-.5068.0908-.9707-.1553-1.3154-.2246-.3164-.6045-.499-1.0615-.5205l-8.6592-.1123a.1559.1559 0 0 1-.1333-.0713c-.0283-.042-.0351-.0986-.021-.1553.0278-.084.1123-.1484.2036-.1562l8.7359-.1123c1.0351-.0489 2.1601-.8868 2.5537-1.9136l.499-1.3013c.0215-.0561.0293-.1128.0147-.168-.5625-2.5463-2.835-4.4453-5.5499-4.4453-2.5039 0-4.6284 1.6177-5.3876 3.8614-.4927-.3658-1.1187-.5625-1.794-.499-1.2026.119-2.1665 1.083-2.2861 2.2856-.0283.31-.0069.6128.0635.894C1.5683 13.171 0 14.7754 0 16.752c0 .1748.0142.3515.0352.5273.0141.083.0844.1475.1689.1475h15.9814c.0909 0 .1758-.0645.2032-.1553l.12-.4268zm2.7568-5.5634c-.0771 0-.1611 0-.2383.0112-.0566 0-.1054.0415-.127.0976l-.3378 1.1744c-.1475.5068-.0918.9707.1543 1.3164.2256.3164.6055.498 1.0625.5195l1.8437.1133c.0557 0 .1055.0263.1329.0703.0283.043.0351.1074.0214.1562-.0283.084-.1132.1485-.204.1553l-1.921.1123c-1.041.0488-2.1582.8867-2.5527 1.914l-.1406.3585c-.0283.0713.0215.1416.0986.1416h6.5977c.0771 0 .1474-.0489.169-.126.1122-.4082.1757-.837.1757-1.2803 0-2.6025-2.125-4.727-4.7344-4.727"/></svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scene 3: Terminal Sync -->
+    <div class="scene" id="scene3">
+        <h2 style="margin-bottom: 40px;">Parallel High-Speed Sync</h2>
+        <div class="term-container">
+            <div class="term-header">
+                <div class="term-dot" style="background:#FF5F56;"></div>
+                <div class="term-dot" style="background:#FFBD2E;"></div>
+                <div class="term-dot" style="background:#27C93F;"></div>
+            </div>
+            <div class="term-body" id="anim-term">
+                <div><span class="prompt">$</span><span class="cursor"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scene 4: AI MCP -->
+    <div class="scene" id="scene4">
+        <h2 style="margin-bottom: 60px;">Built for AI Agents</h2>
+        <div class="ai-chat">
+            <p><strong>Claude:</strong> "I've analyzed the data. I'll write the results directly to your S3 bucket via Storage Bridge."</p>
+        </div>
+        <div class="json-block">
+            {<br>
+            &nbsp;&nbsp;"jsonrpc": "2.0",<br>
+            &nbsp;&nbsp;"method": "write_file",<br>
+            &nbsp;&nbsp;"params": {<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"target": "s3:/results.json",<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;"content": "{...}"<br>
+            &nbsp;&nbsp;}<br>
+            }
+        </div>
+    </div>
+
+    <!-- Scene 5: Outro -->
+    <div class="scene" id="scene5">
+        <div class="logo-container fade-up">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
+        </div>
+        <h1 class="fade-up outro-text">Storage Bridge</h1>
+        <p class="fade-up outro-text" style="color:hsl(var(--accent)); font-weight:bold; margin-bottom: 20px;">Open Source & Available Now</p>
+        <p class="fade-up outro-text">Engineered by Chris Mon Saji (Chriz)</p>
+        <p class="fade-up outro-text" style="font-size: 1.2rem; margin-top: 10px;">github.com/chriz-3656/storage-bridge</p>
+    </div>
+
+    <script>
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
+        
+        async function switchScene(from, to) {
+            if (from) document.getElementById(from).classList.remove('active');
+            await sleep(1000); // Wait for fade out
+            if (to) document.getElementById(to).classList.add('active');
+        }
+
+        async function typeTerminal() {
+            const term = document.getElementById("anim-term");
+            term.innerHTML = `<div><span class="prompt">$</span><span class="cmd-text"></span><span class="cursor"></span></div>`;
+            const cmdText = term.querySelector(".cmd-text");
+            const cursor = term.querySelector(".cursor");
+
+            await sleep(1500);
+            const cmd = "storage-bridge sync local:./src s3:/backup --workers 16";
+            for(let i=0; i<cmd.length; i++) {
+                cmdText.textContent += cmd[i];
+                await sleep(30 + Math.random() * 40);
+            }
+            
+            await sleep(300);
+            cursor.remove();
+            
+            const outLines = [
+                "Building destination file list for s3:/backup...",
+                "Building source file list for local:./src...",
+                "[Worker 1] Syncing data1.bin → backup/data1.bin",
+                "[Worker 2] Syncing data2.bin → backup/data2.bin",
+                "[Worker 3] Syncing data3.bin → backup/data3.bin",
+                "[Worker 1] ✓ Synced data1.bin",
+                "[Worker 2] ✓ Synced data2.bin",
+                "[Worker 3] ✓ Synced data3.bin",
+                "<span style='color:#27C93F'>Sync completed successfully.</span>"
+            ];
+
+            for(const line of outLines) {
+                term.innerHTML += `<div style="margin-top:8px">${line}</div>`;
+                await sleep(200);
+            }
+            term.innerHTML += `<div style="margin-top:20px"><span class="prompt">$</span><span class="cursor"></span></div>`;
+        }
+
+        async function startCinematic() {
+            document.getElementById('playBtn').style.display = 'none';
+
+            // SCENE 1: Intro (0s -> 4s)
+            document.getElementById('scene1').classList.add('active');
+            await sleep(4000);
+
+            // SCENE 2: Union (4s -> 11s)
+            await switchScene('scene1', 'scene2');
+            
+            // Trigger lines after node animations
+            setTimeout(() => {
+                document.getElementById('line1').style.width = '240px';
+                document.getElementById('line2').style.width = '240px';
+                document.getElementById('line3').style.width = '240px';
+            }, 1000);
+            
+            await sleep(6000);
+
+            // SCENE 3: Terminal (11s -> 18s)
+            await switchScene('scene2', 'scene3');
+            await typeTerminal();
+            await sleep(2000);
+
+            // SCENE 4: AI MCP (18s -> 25s)
+            await switchScene('scene3', 'scene4');
+            await sleep(5000);
+
+            // SCENE 5: Outro (25s -> End)
+            await switchScene('scene4', 'scene5');
+        }
+    </script>
+</body>
+</html>
