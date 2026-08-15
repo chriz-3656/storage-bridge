@@ -53,7 +53,7 @@
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             opacity: 0; pointer-events: none;
-            display: none; /* Strictly prevents overlapping */
+            display: none; 
             transform: scale(0.9) translateY(100px);
             transition: all 0.6s cubic-bezier(0.65, 0, 0.35, 1);
         }
@@ -144,7 +144,7 @@
     <div id="frame">
         <div id="camera">
             
-            <!-- SCENE 01: THE PROBLEM (0:00-0:05) -->
+            <!-- SCENE 01: THE PROBLEM -->
             <div class="scene" id="scene-01" style="display: block;">
                 <div class="terminal" id="term-01" style="width: 300px; padding: 20px; font-size: 24px; top: 540px; left: 960px;">
                     <span class="prompt">$</span><span id="cmd-01"></span><span class="cursor" id="cursor-01"></span>
@@ -166,7 +166,7 @@
                 <div class="kinetic-text" id="text-01" style="position: absolute; bottom: 8%; width: 100%; text-align: center; opacity: 0; font-size: 36px; color: var(--text-dim); transition: all 1s; transform: translateY(20px);">DIFFERENT STORAGE. DIFFERENT INTERFACES.</div>
             </div>
 
-            <!-- SCENE 02: PRODUCT REVEAL (0:05-0:10) -->
+            <!-- SCENE 02: PRODUCT REVEAL -->
             <div class="scene" id="scene-02">
                 <div style="position: absolute; top: 250px; left: 960px; transform: translate(-50%, -50%); opacity: 0; transition: all 1s;" id="logo-reveal">
                     <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
@@ -183,7 +183,7 @@
                 </div>
             </div>
 
-            <!-- SCENE 03: CONNECT (0:10-0:17) -->
+            <!-- SCENE 03: CONNECT -->
             <div class="scene" id="scene-03">
                 <div class="terminal" id="term-03" style="top: 600px; left: 960px; width: 700px;">
                     <span class="prompt">$</span><span id="cmd-03"></span><span class="cursor" id="cursor-03"></span>
@@ -199,7 +199,7 @@
                 <div class="kinetic-text" id="text-03" style="position: absolute; bottom: 8%; width: 100%; text-align: center; opacity: 0; font-size: 36px; color: var(--text-dim); transition: opacity 1s;">CONNECT ONCE.</div>
             </div>
 
-            <!-- SCENE 04: FIRST COMMAND (0:17-0:24) -->
+            <!-- SCENE 04: FIRST COMMAND -->
             <div class="scene" id="scene-04">
                 <div class="terminal" id="term-04" style="left: 600px; top: 540px; width: 700px;">
                     <span class="prompt">$</span><span id="cmd-04"></span><span class="cursor" id="cursor-04"></span>
@@ -221,7 +221,7 @@
                 </div>
             </div>
 
-            <!-- SCENE 05: UPLOAD (0:24-0:32) HERO SCENE -->
+            <!-- SCENE 05: UPLOAD HERO SCENE -->
             <div class="scene" id="scene-05">
                 <div class="terminal" id="term-05" style="top: 850px; left: 960px; width: 1000px;">
                     <span class="prompt">$</span><span id="cmd-05"></span><span class="cursor" id="cursor-05"></span>
@@ -239,7 +239,7 @@
                 <div class="kinetic-text" id="text-05" style="position: absolute; bottom: 8%; width: 100%; text-align: center; opacity: 0; font-size: 36px; color: var(--text-dim); transition: opacity 1s;">UPLOAD ANYWHERE.</div>
             </div>
 
-            <!-- SCENE 06: ONE CORE, MANY BACKENDS (0:32-0:40) -->
+            <!-- SCENE 06: ONE CORE, MANY BACKENDS -->
             <div class="scene" id="scene-06">
                 <div class="terminal multi-term" id="term-06a" style="top: 200px; left: 400px; width: 500px; font-size: 20px;"><span class="prompt">$</span> put local:</div>
                 <div class="terminal multi-term" id="term-06b" style="top: 200px; left: 960px; width: 500px; font-size: 20px;"><span class="prompt">$</span> put s3:</div>
@@ -276,7 +276,7 @@
                 <div class="kinetic-text" id="text-06" style="position: absolute; bottom: 8%; width: 100%; text-align: center; opacity: 0; font-size: 36px; color: var(--text-main); transition: opacity 1s;">ONE CORE.</div>
             </div>
 
-            <!-- SCENE 07: SIMPLE MODE (0:40-0:47) -->
+            <!-- SCENE 07: SIMPLE MODE -->
             <div class="scene" id="scene-07">
                 <div class="terminal" id="term-07" style="top: 300px; left: 960px; width: 1000px;">
                     <div id="line-07a"><span class="prompt">$</span><span id="cmd-07a"></span><span class="cursor" id="c-07a"></span></div>
@@ -296,19 +296,39 @@
                 <div class="file-icon" id="file-07" style="top: 700px; left: 600px; z-index: 10;">PDF</div>
             </div>
 
-            <!-- SCENE 08: POWER MODE (0:47-0:53) -->
+            <!-- SCENE 08: POWER MODE (Increased Duration & Commands) -->
             <div class="scene" id="scene-08">
                 <div class="terminal" id="term-08" style="width: 1400px; font-size: 32px; border-color: var(--text-dim); top: 540px; left: 960px;">
                     <div style="color: var(--text-dim); text-transform: uppercase; font-size: 16px; margin-bottom: 30px; letter-spacing: 2px;">ADVANCED SYNTAX</div>
                     <div><span class="prompt">$</span><span id="cmd-08a"></span><span class="cursor" id="c-08a"></span></div>
-                    <div style="margin-top: 30px; opacity: 0; transition: opacity 0.5s;" id="line-08b"><span class="prompt">$</span><span id="cmd-08b"></span></div>
+                    <div style="margin-top: 30px; opacity: 0; transition: opacity 0.5s;" id="line-08b"><span class="prompt">$</span><span id="cmd-08b"></span><span class="cursor" id="c-08b"></span></div>
+                    <div style="margin-top: 30px; opacity: 0; transition: opacity 0.5s;" id="line-08c"><span class="prompt">$</span><span id="cmd-08c"></span><span class="cursor" id="c-08c"></span></div>
                 </div>
                 <div class="kinetic-text" id="text-08" style="position: absolute; bottom: 15%; width: 100%; text-align: center; opacity: 0; font-size: 36px; transition: opacity 1s;">ADVANCED CONTROL.</div>
             </div>
 
-            <!-- SCENE 09: ARCHITECTURE EXPANSION (0:53-0:57) -->
+            <!-- SCENE 08.5: AI AGENT MCP (NEW SCENE) -->
+            <div class="scene" id="scene-85">
+                <!-- AI Agent representation -->
+                <div style="position: absolute; top: 300px; left: 960px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                    <div style="background: var(--term-border); padding: 25px 50px; border-radius: 40px; font-size: 28px; font-style: italic; color: var(--text-main);">
+                        "Find the Q3 report and back it up to S3."
+                    </div>
+                </div>
+                
+                <!-- MCP Protocol Terminal -->
+                <div class="terminal" style="top: 650px; left: 960px; width: 1300px; font-size: 22px; color: var(--term-green); background: #080808;">
+                    <div id="mcp-1" style="opacity: 0; transform: translateY(10px); transition: all 0.4s;"><span class="prompt" style="color:var(--text-dim);">→</span> {"jsonrpc":"2.0","method":"list","params":{"remote":"local:Documents/"}}</div>
+                    <div id="mcp-2" style="margin-top: 15px; color: var(--text-dim); opacity: 0; transform: translateY(10px); transition: all 0.4s;"><span class="prompt">←</span> {"jsonrpc":"2.0","result":["Q3-report.pdf", "invoices/"]}</div>
+                    <div id="mcp-3" style="margin-top: 25px; opacity: 0; transform: translateY(10px); transition: all 0.4s;"><span class="prompt" style="color:var(--text-dim);">→</span> {"jsonrpc":"2.0","method":"copy","params":{"src":"local:Documents/Q3-report.pdf","dst":"s3:backups/"}}</div>
+                    <div id="mcp-4" style="margin-top: 15px; color: var(--text-dim); opacity: 0; transform: translateY(10px); transition: all 0.4s;"><span class="prompt">←</span> {"jsonrpc":"2.0","result":{"status":"success", "copied":1}}</div>
+                </div>
+
+                <div class="kinetic-text" id="text-85" style="position: absolute; bottom: 10%; width: 100%; text-align: center; opacity: 0; font-size: 36px; color: var(--text-main); transition: opacity 1s;">NATIVE MCP SUPPORT.</div>
+            </div>
+
+            <!-- SCENE 09: ARCHITECTURE EXPANSION -->
             <div class="scene" id="scene-09">
-                <!-- Inline opacities added to immediately render the scene without needing JS class toggle -->
                 <div class="architecture-node" style="top: 200px; left: 960px; border-color: var(--term-green); color: var(--term-green); opacity: 1 !important;">MCP (JSON-RPC)</div>
                 <div class="line" style="width: 2px; height: 100px; top: 250px; left: 960px; opacity: 1;"></div>
                 <div class="architecture-node" style="top: 400px; left: 960px; border-color: var(--text-main); font-weight: 700; font-size: 32px; opacity: 1 !important;">STORAGE BRIDGE</div>
@@ -325,7 +345,6 @@
                 <div class="line" style="width: 2px; height: 50px; top: 630px; left: 1380px; opacity: 1;"></div>
                 <div class="line" style="width: 2px; height: 50px; top: 630px; left: 1660px; opacity: 1;"></div>
 
-                <!-- Icons added inline and opacity set to 1 so they actually render -->
                 <div class="architecture-node" style="top: 740px; left: 260px; width: 220px; opacity: 1 !important;">
                     <svg class="node-icon" fill="#A1A1AA" viewBox="0 0 24 24"><path d="M22 12H2M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>LOCAL</div>
                 <div class="architecture-node" style="top: 740px; left: 540px; width: 220px; opacity: 1 !important;">
@@ -342,7 +361,7 @@
                 <div class="kinetic-text" id="text-09" style="position: absolute; bottom: 8%; width: 100%; text-align: center; opacity: 0; font-size: 36px; color: var(--text-dim); transition: opacity 1s;">BUILT FOR HUMANS. READY FOR AGENTS.</div>
             </div>
 
-            <!-- SCENE 10: FINAL HERO (0:57-1:00) -->
+            <!-- SCENE 10: FINAL HERO -->
             <div class="scene" id="scene-10">
                 <div class="terminal" id="term-10" style="width: 500px; text-align: center; border: none; background: transparent; box-shadow: none; top: 540px; left: 960px;">
                     <span class="prompt" style="opacity: 0.5;">$</span><span id="cmd-10"></span><span class="cursor" id="cursor-10"></span>
@@ -360,7 +379,6 @@
     </div>
 
     <script>
-        // Responsive Scaling to fit window precisely
         function resizeFrame() {
             const frame = document.getElementById('frame');
             const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
@@ -388,17 +406,17 @@
                 oldEl.classList.remove('active');
                 oldEl.classList.add(exitClass);
             }
-            await sleep(300); // Partial overlap for smoothness (cross-slide)
+            // REDUCED TRANSITION WAIT TIMES
+            await sleep(200); 
             if (newId) {
                 const newEl = document.getElementById(newId);
                 newEl.style.display = 'block';
-                void newEl.offsetWidth; // Reflow
+                void newEl.offsetWidth; 
                 newEl.classList.remove('exit-up', 'exit-down', 'exit-left'); 
                 newEl.classList.add('active');
             }
-            await sleep(300); // Wait for transition to complete
+            await sleep(400); 
             if (oldId) {
-                // Hard hide to entirely prevent any visual overlap between deeply nested elements
                 document.getElementById(oldId).style.display = 'none';
             }
         }
@@ -407,14 +425,14 @@
             document.getElementById('play-overlay').style.display = 'none';
             camera.style.transform = 'scale(1)';
 
-            /* SCENE 01: THE PROBLEM (0:00 - 0:05) */
+            /* SCENE 01: THE PROBLEM */
             await typeCmd('cmd-01', 'cursor-01', 'ls');
-            await sleep(300);
+            await sleep(200);
             
             document.getElementById('node-local').classList.add('fade-in');
             document.getElementById('node-s3').classList.add('fade-in');
             document.getElementById('node-gdrive').classList.add('fade-in');
-            await sleep(500);
+            await sleep(300);
             
             document.getElementById('label-local').classList.add('fade-in-basic');
             document.getElementById('label-s3').classList.add('fade-in-basic');
@@ -426,86 +444,86 @@
             
             document.getElementById('text-01').style.opacity = '1';
             document.getElementById('text-01').style.transform = 'translateY(0)';
-            await sleep(2500);
+            await sleep(1500);
 
-            /* SCENE 02: PRODUCT REVEAL (0:05 - 0:10) */
+            /* SCENE 02: PRODUCT REVEAL */
             await switchScene('scene-01', 'scene-02', 'exit-up');
             
-            await sleep(500);
+            await sleep(300);
             await typeCmd('cmd-02', 'cursor-02', 'storage-bridge');
-            await sleep(500);
+            await sleep(300);
             
             document.getElementById('logo-reveal').classList.add('fade-in-basic');
             document.getElementById('logo-reveal').style.transform = 'translate(-50%, -50%)';
             document.getElementById('text-02').classList.add('fade-in-basic');
             document.getElementById('text-02').style.transform = 'translateY(0)';
-            await sleep(2500);
+            await sleep(1500);
 
-            /* SCENE 03: CONNECT (0:10 - 0:17) */
+            /* SCENE 03: CONNECT */
             await switchScene('scene-02', 'scene-03', 'exit-left');
             
-            await sleep(500);
+            await sleep(300);
             await typeCmd('cmd-03', 'cursor-03', 'storage-bridge login');
-            await sleep(800);
+            await sleep(500);
             
             document.getElementById('auth-line').style.transform = 'scaleY(1)';
             document.getElementById('auth-line').classList.add('fade-in-basic');
-            await sleep(300);
+            await sleep(200);
             document.getElementById('auth-card').classList.add('fade-in-basic');
             
-            await sleep(1000);
+            await sleep(500);
             document.getElementById('text-03').classList.add('fade-in-basic');
-            await sleep(3000);
+            await sleep(1500);
 
-            /* SCENE 04: FIRST COMMAND (0:17 - 0:24) */
+            /* SCENE 04: FIRST COMMAND */
             await switchScene('scene-03', 'scene-04', 'exit-up');
             
-            await sleep(500);
-            await typeCmd('cmd-04', 'cursor-04', 'storage-bridge list');
             await sleep(300);
+            await typeCmd('cmd-04', 'cursor-04', 'storage-bridge list');
+            await sleep(200);
             
             document.getElementById('out-04a').classList.add('fade-in-basic'); document.getElementById('out-04a').style.transform = 'translateX(0)'; await sleep(100);
             document.getElementById('out-04b').classList.add('fade-in-basic'); document.getElementById('out-04b').style.transform = 'translateX(0)'; await sleep(100);
-            document.getElementById('out-04c').classList.add('fade-in-basic'); document.getElementById('out-04c').style.transform = 'translateX(0)'; await sleep(500);
+            document.getElementById('out-04c').classList.add('fade-in-basic'); document.getElementById('out-04c').style.transform = 'translateX(0)'; await sleep(300);
             
             document.getElementById('obj-04').classList.add('fade-in-basic');
             document.getElementById('text-04').classList.add('fade-in-basic');
-            await sleep(500);
-            document.getElementById('t-04a').classList.add('fade-in-basic'); document.getElementById('t-04a').style.transform = 'translateX(0)'; await sleep(600);
-            document.getElementById('t-04b').classList.add('fade-in-basic'); document.getElementById('t-04b').style.transform = 'translateX(0)'; await sleep(600);
-            document.getElementById('t-04c').classList.add('fade-in-basic'); document.getElementById('t-04c').style.transform = 'translateX(0)'; await sleep(1500);
+            await sleep(400);
+            document.getElementById('t-04a').classList.add('fade-in-basic'); document.getElementById('t-04a').style.transform = 'translateX(0)'; await sleep(400);
+            document.getElementById('t-04b').classList.add('fade-in-basic'); document.getElementById('t-04b').style.transform = 'translateX(0)'; await sleep(400);
+            document.getElementById('t-04c').classList.add('fade-in-basic'); document.getElementById('t-04c').style.transform = 'translateX(0)'; await sleep(1200);
 
-            /* SCENE 05: UPLOAD HERO (0:24 - 0:32) */
+            /* SCENE 05: UPLOAD HERO */
             await switchScene('scene-04', 'scene-05', 'exit-left');
             
-            await sleep(500);
+            await sleep(300);
             await typeCmd('cmd-05', 'cursor-05', 'storage-bridge upload report.pdf');
-            await sleep(500);
+            await sleep(300);
             
             const heroFile = document.getElementById('hero-file');
             heroFile.classList.add('fade-in');
-            await sleep(800);
+            await sleep(500);
             heroFile.style.top = '500px'; 
             document.getElementById('bridge').classList.add('fade-in');
             
-            await sleep(1000);
+            await sleep(700);
             document.getElementById('dest-local').classList.add('fade-in');
             document.getElementById('dest-s3').classList.add('fade-in');
             document.getElementById('dest-drive').classList.add('fade-in');
             
-            await sleep(1000);
+            await sleep(700);
             heroFile.style.top = '200px';
             heroFile.style.left = '1420px'; 
             
-            await sleep(1000);
+            await sleep(700);
             document.getElementById('out-05').classList.add('fade-in-basic');
             document.getElementById('text-05').classList.add('fade-in-basic');
-            await sleep(2500);
+            await sleep(1500);
 
-            /* SCENE 06: ONE CORE (0:32 - 0:40) */
+            /* SCENE 06: ONE CORE */
             await switchScene('scene-05', 'scene-06', 'exit-up');
             
-            await sleep(500);
+            await sleep(300);
             const tA = document.getElementById('term-06a');
             const tB = document.getElementById('term-06b');
             const tC = document.getElementById('term-06c');
@@ -514,10 +532,10 @@
             tC.style.left = '960px'; tC.style.transform = 'translate(-50%, -50%) scale(0.5)'; tC.style.opacity = '0';
             tB.style.transform = 'translate(-50%, -50%) scale(0.5)'; tB.style.opacity = '0';
             
-            await sleep(800);
+            await sleep(600);
             document.getElementById('arch-core').classList.add('fade-in');
             
-            await sleep(1000);
+            await sleep(600);
             document.getElementById('arch-line-v').style.transform = 'scaleY(1)'; document.getElementById('arch-line-v').classList.add('fade-in-basic');
             document.getElementById('arch-api').classList.add('fade-in');
             document.getElementById('arch-line-v2').style.transform = 'scaleY(1)'; document.getElementById('arch-line-v2').classList.add('fade-in-basic');
@@ -530,54 +548,82 @@
             for(let node of nodes) { node.classList.add('fade-in'); }
             
             document.getElementById('text-06').classList.add('fade-in-basic');
-            await sleep(3500);
+            await sleep(2000);
 
-            /* SCENE 07: SIMPLE MODE (0:40 - 0:47) */
+            /* SCENE 07: SIMPLE MODE */
             await switchScene('scene-06', 'scene-07', 'exit-left');
             
-            await sleep(500);
+            await sleep(300);
             await typeCmd('cmd-07a', 'c-07a', 'cd Projects');
             document.getElementById('folder-1').classList.add('fade-in-basic');
             document.getElementById('folder-2').classList.add('fade-in-basic');
             document.getElementById('file-07').classList.add('fade-in');
             
-            await sleep(800);
+            await sleep(500);
             document.getElementById('line-07b').style.display = 'block';
             await typeCmd('cmd-07b', 'c-07b', 'move report.pdf Documents/');
             
             document.getElementById('file-07').style.left = '1300px'; 
             
-            await sleep(2500);
+            await sleep(1500);
 
-            /* SCENE 08: POWER MODE (0:47 - 0:53) */
+            /* SCENE 08: POWER MODE (Extended) */
             await switchScene('scene-07', 'scene-08', 'exit-up');
             
-            await sleep(500);
+            await sleep(300);
             await typeCmd('cmd-08a', 'c-08a', 'put backup.zip s3:backups/', 20); 
             document.getElementById('text-08').classList.add('fade-in-basic');
             
-            await sleep(1000);
+            await sleep(800);
             document.getElementById('line-08b').style.opacity = '1';
-            await typeCmd('cmd-08b', null, 'get s3:backups/backup.zip ./', 20);
+            await typeCmd('cmd-08b', 'c-08b', 'get s3:backups/backup.zip ./', 20);
+
+            await sleep(800);
+            document.getElementById('line-08c').style.opacity = '1';
+            await typeCmd('cmd-08c', null, 'cat s3:logs/error.log', 20);
+            
+            await sleep(3000); // Extended hold so user can read
+
+            /* SCENE 08.5: AI AGENT MCP */
+            await switchScene('scene-08', 'scene-85', 'exit-left');
+
+            await sleep(800);
+            document.getElementById('mcp-1').classList.add('fade-in');
+            document.getElementById('mcp-1').style.transform = 'translateY(0)';
+            
+            await sleep(600);
+            document.getElementById('mcp-2').classList.add('fade-in');
+            document.getElementById('mcp-2').style.transform = 'translateY(0)';
+
+            await sleep(600);
+            document.getElementById('mcp-3').classList.add('fade-in');
+            document.getElementById('mcp-3').style.transform = 'translateY(0)';
+
+            await sleep(600);
+            document.getElementById('mcp-4').classList.add('fade-in');
+            document.getElementById('mcp-4').style.transform = 'translateY(0)';
+
+            await sleep(500);
+            document.getElementById('text-85').classList.add('fade-in-basic');
             
             await sleep(2500);
 
-            /* SCENE 09: ARCHITECTURE EXPANSION (0:53 - 0:57) */
-            await switchScene('scene-08', 'scene-09', 'exit-left');
+            /* SCENE 09: ARCHITECTURE EXPANSION */
+            await switchScene('scene-85', 'scene-09', 'exit-up');
             
-            await sleep(1500);
+            await sleep(800);
             document.getElementById('text-09').classList.add('fade-in-basic');
-            await sleep(2500);
+            await sleep(2000);
 
-            /* SCENE 10: FINAL HERO (0:57 - 1:00) */
+            /* SCENE 10: FINAL HERO */
             await switchScene('scene-09', 'scene-10', 'exit-up');
             
-            await sleep(500);
+            await sleep(300);
             await typeCmd('cmd-10', 'cursor-10', 'storage-bridge');
-            await sleep(500);
+            await sleep(300);
             
             document.getElementById('term-10').classList.add('fade-out');
-            await sleep(500);
+            await sleep(300);
             
             document.getElementById('final-brand').style.opacity = '1';
             
