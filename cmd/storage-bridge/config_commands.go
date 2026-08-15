@@ -68,6 +68,7 @@ var providerAddCmd = &cobra.Command{
 		upstreams, _ := cmd.Flags().GetString("upstreams")
 		policy, _ := cmd.Flags().GetString("policy")
 		bucket, _ := cmd.Flags().GetString("bucket")
+		endpoint, _ := cmd.Flags().GetString("endpoint")
 		
 		if pType == "" {
 			return fmt.Errorf("--type is required")
@@ -85,6 +86,7 @@ var providerAddCmd = &cobra.Command{
 				"upstreams": upstreams,
 				"policy":    policy,
 				"bucket":    bucket,
+				"endpoint":  endpoint,
 			},
 		}
 		
@@ -191,11 +193,12 @@ func init() {
 	rootCmd.AddCommand(authCmd)
 	authCmd.AddCommand(authLoginCmd)
 	
-	providerAddCmd.Flags().String("type", "", "Provider type (e.g. drive, s3, local, union)")
-	providerAddCmd.Flags().String("account", "", "Auth account name (e.g. google)")
-	providerAddCmd.Flags().String("upstreams", "", "Comma separated list of upstream provider names (for union)")
-	providerAddCmd.Flags().String("policy", "", "Union policy (e.g. first, all)")
-	providerAddCmd.Flags().String("bucket", "", "Bucket name (for s3)")
+	providerAddCmd.Flags().StringP("type", "t", "", "Type of provider (s3, drive, local, memory, union)")
+	providerAddCmd.Flags().StringP("account", "a", "", "Account identifier (for drive)")
+	providerAddCmd.Flags().StringP("upstreams", "u", "", "Comma separated list of upstream providers (for union)")
+	providerAddCmd.Flags().StringP("policy", "p", "first", "Policy for routing operations (for union)")
+	providerAddCmd.Flags().StringP("bucket", "b", "", "Bucket name (for s3)")
+	providerAddCmd.Flags().StringP("endpoint", "e", "", "Custom endpoint URL (for s3, enables R2/B2/Spaces support)")
 	
 	rootCmd.AddCommand(providerCmd)
 	providerCmd.AddCommand(providerAddCmd)

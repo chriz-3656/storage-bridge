@@ -11,6 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 	
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	s3sdk "github.com/aws/aws-sdk-go-v2/service/s3"
 	
@@ -100,7 +101,21 @@ func resolveProvider(target string) (storage.Provider, string, error) {
 				return memProvider, path, nil
 			case "s3":
 				bucket := pConf.Params["bucket"]
-				cfg, err := config.LoadDefaultConfig(context.Background())
+				endpoint := pConf.Params["endpoint"]
+				
+				var opts []func(*config.LoadOptions) error
+				if endpoint != "" {
+					customResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
+						return aws.Endpoint{
+							PartitionID:   "aws",
+							URL:           endpoint,
+							SigningRegion: region,
+						}, nil
+					})
+					opts = append(opts, config.WithEndpointResolverWithOptions(customResolver))
+				}
+				
+				cfg, err := config.LoadDefaultConfig(context.Background(), opts...)
 				if err != nil {
 					return nil, "", err
 				}
