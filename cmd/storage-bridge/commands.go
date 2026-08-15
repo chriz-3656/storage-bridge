@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	s3sdk "github.com/aws/aws-sdk-go-v2/service/s3"
 
+	"github.com/storage-bridge/core/pkg/providers/drive"
 	"github.com/storage-bridge/core/pkg/providers/local"
 	"github.com/storage-bridge/core/pkg/providers/memory"
 	"github.com/storage-bridge/core/pkg/providers/s3"
@@ -60,6 +61,12 @@ func resolveProvider(target string) (storage.Provider, string, error) {
 		}
 		client := s3sdk.NewFromConfig(cfg)
 		return s3.New(client, bucket), key, nil
+	case "drive":
+		provider, err := drive.New(context.Background(), "credentials.json", "token.json")
+		if err != nil {
+			return nil, "", err
+		}
+		return provider, path, nil
 	default:
 		return nil, "", fmt.Errorf("unknown provider: %s", providerName)
 	}

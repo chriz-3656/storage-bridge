@@ -8,6 +8,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.22.42
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.107.1
 	github.com/spf13/cobra v1.8.0
+	golang.org/x/oauth2 v0.23.0
+	google.golang.org/api v0.198.0
 )
 
 require (
