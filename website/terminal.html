@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storage Bridge | Virtual Terminal</title>
+    <style>
+        :root {
+            --bg-base: 228 10% 4%; --bg-surface: 228 8% 8%; --bg-elevated: 228 8% 12%;
+            --text-primary: 0 0% 98%; --text-secondary: 228 10% 60%;
+            --accent: 210 100% 55%; --border-dim: 228 8% 16%;
+            --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 2rem; --spacing-xl: 4rem;
+            --radius-md: 8px; --radius-lg: 12px;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-sans); background: hsl(var(--bg-base)); color: hsl(var(--text-primary)); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+        
+        h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
+        h1 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: var(--spacing-md); text-align: center; }
+        p.subtitle { color: hsl(var(--text-secondary)); text-align: center; margin-bottom: var(--spacing-xl); }
+        
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 var(--spacing-lg); }
+        
+        /* Nav */
+        nav { padding: var(--spacing-lg) 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid hsl(var(--border-dim)); margin-bottom: var(--spacing-xl); }
+        .logo { font-weight: 700; font-size: 1.25rem; display: flex; align-items: center; gap: var(--spacing-sm); text-decoration: none; color: hsl(var(--text-primary)); }
+        .logo svg { width: 24px; height: 24px; color: hsl(var(--accent)); }
+        .nav-links { display: flex; gap: var(--spacing-lg); }
+        .nav-links a { color: hsl(var(--text-secondary)); text-decoration: none; font-size: 0.95rem; font-weight: 500; transition: color 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: hsl(var(--text-primary)); }
+
+        /* Terminal Window */
+        .terminal-window {
+            background: #000;
+            border-radius: var(--radius-lg);
+            border: 1px solid hsl(var(--border-dim));
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .terminal-header {
+            background: hsl(var(--bg-elevated));
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid hsl(var(--border-dim));
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+        }
+        .dot.red { background: #FF5F56; }
+        .dot.yellow { background: #FFBD2E; }
+        .dot.green { background: #27C93F; }
+
+        .terminal-title {
+            flex-grow: 1;
+            text-align: center;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: hsl(var(--text-secondary));
+        }
+
+        .terminal-body {
+            padding: var(--spacing-lg);
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            color: #A8B2D1;
+            height: 400px;
+            overflow-y: auto;
+        }
+
+        .prompt { color: hsl(var(--accent)); font-weight: bold; margin-right: 8px; }
+        .command { color: #FFF; }
+        .output { color: #A8B2D1; margin: 8px 0 16px 0; white-space: pre-wrap; line-height: 1.4; }
+        .cursor {
+            display: inline-block;
+            width: 8px; height: 16px;
+            background: #FFF;
+            animation: blink 1s step-end infinite;
+            vertical-align: text-bottom;
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        .btn-replay {
+            display: block;
+            margin: var(--spacing-lg) auto;
+            background: transparent;
+            border: 1px solid hsl(var(--border-dim));
+            color: hsl(var(--text-primary));
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-family: var(--font-sans);
+            transition: background 0.2s;
+        }
+        .btn-replay:hover { background: hsl(var(--bg-surface)); }
+
+        footer { padding: var(--spacing-xl) 0; margin-top: var(--spacing-xl); border-top: 1px solid hsl(var(--border-dim)); text-align: center; color: hsl(var(--text-secondary)); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <nav>
+        <a href="index.html" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
+            Storage Bridge
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Overview</a>
+            <a href="docs.html">Documentation</a>
+            <a href="terminal.html" class="active">Virtual Terminal</a>
+            <a href="https://github.com/chriz-3656/storage-bridge" target="_blank">GitHub</a>
+        </div>
+    </nav>
+
+    <h1>Virtual Terminal</h1>
+    <p class="subtitle">Watch Storage Bridge in action across multiple cloud environments.</p>
+
+    <div class="terminal-window">
+        <div class="terminal-header">
+            <div class="terminal-dots">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+            </div>
+            <div class="terminal-title">user@cloud-engine: ~</div>
+        </div>
+        <div class="terminal-body" id="term-body">
+            <!-- Content injected by JS -->
+        </div>
+    </div>
+    
+    <button class="btn-replay" onclick="startTyping()">Replay Animation</button>
+
+    <footer>
+        <p>&copy; 2026 Storage Bridge. Open-Source Multi-Cloud Architecture.</p>
+    </footer>
+</div>
+
+<script>
+    const script = [
+        { cmd: "storage-bridge provider add my-r2 --type s3 --bucket images --endpoint https://123.r2.cloudflarestorage.com", out: "Successfully added provider 'my-r2'!\n" },
+        { cmd: "storage-bridge default set my-r2", out: "Default provider set to my-r2\n" },
+        { cmd: "storage-bridge list", out: "     231.2K  summer-vacation.jpg\n       1.1M  presentation.pdf\n" },
+        { cmd: "storage-bridge mkdir archives", out: "✓ Directory created successfully\n" },
+        { cmd: "storage-bridge move presentation.pdf archives/presentation.pdf", out: "✓ Moved successfully\n" },
+        { cmd: "storage-bridge cd archives", out: "" },
+        { cmd: "storage-bridge pwd", out: "my-r2:/archives\n" },
+        { cmd: "storage-bridge sync local:./old-backups my-r2:/archives --workers 8", out: "Building destination file list for my-r2:/archives...\nBuilding source file list for local:/old-backups...\n[Worker 1] Syncing old-backups/data1.csv → archives/data1.csv\n[Worker 2] Syncing old-backups/data2.csv → archives/data2.csv\n[Worker 1] ✓ Synced data1.csv\n[Worker 2] ✓ Synced data2.csv\nSync completed successfully.\n" }
+    ];
+
+    const termBody = document.getElementById("term-body");
+    let isTyping = false;
+
+    async function typeText(text, element) {
+        for (let i = 0; i < text.length; i++) {
+            element.textContent += text.charAt(i);
+            await new Promise(r => setTimeout(r, 30 + Math.random() * 40));
+        }
+    }
+
+    async function startTyping() {
+        if (isTyping) return;
+        isTyping = true;
+        termBody.innerHTML = "";
+
+        for (const line of script) {
+            const lineDiv = document.createElement("div");
+            lineDiv.innerHTML = `<span class="prompt">$</span><span class="command"></span><span class="cursor"></span>`;
+            termBody.appendChild(lineDiv);
+            
+            const cmdSpan = lineDiv.querySelector(".command");
+            const cursor = lineDiv.querySelector(".cursor");
+            
+            await typeText(line.cmd, cmdSpan);
+            
+            await new Promise(r => setTimeout(r, 200));
+            cursor.remove();
+
+            if (line.out) {
+                const outDiv = document.createElement("div");
+                outDiv.className = "output";
+                outDiv.textContent = line.out;
+                termBody.appendChild(outDiv);
+            }
+            termBody.scrollTop = termBody.scrollHeight;
+            await new Promise(r => setTimeout(r, 800));
+        }
+
+        const endDiv = document.createElement("div");
+        endDiv.innerHTML = `<span class="prompt">$</span><span class="cursor"></span>`;
+        termBody.appendChild(endDiv);
+        termBody.scrollTop = termBody.scrollHeight;
+        isTyping = false;
+    }
+
+    window.onload = () => setTimeout(startTyping, 500);
+</script>
+</body>
+</html>

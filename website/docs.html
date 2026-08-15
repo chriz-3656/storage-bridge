@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storage Bridge | Documentation</title>
+    <style>
+        :root {
+            --bg-base: 228 10% 4%; --bg-surface: 228 8% 8%; --bg-elevated: 228 8% 12%;
+            --text-primary: 0 0% 98%; --text-secondary: 228 10% 60%;
+            --accent: 210 100% 55%; --border-dim: 228 8% 16%; --code-bg: 228 12% 6%;
+            --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 2rem; --spacing-xl: 4rem;
+            --radius-md: 8px; --radius-lg: 12px;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-sans); background: hsl(var(--bg-base)); color: hsl(var(--text-primary)); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+        h1, h2, h3 { line-height: 1.2; letter-spacing: -0.02em; }
+        h1 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: var(--spacing-md); }
+        h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin-top: var(--spacing-xl); margin-bottom: var(--spacing-lg); border-bottom: 1px solid hsl(var(--border-dim)); padding-bottom: var(--spacing-sm); }
+        h3 { font-size: 1.25rem; margin-bottom: var(--spacing-sm); margin-top: var(--spacing-lg); color: hsl(var(--accent)); }
+        p { color: hsl(var(--text-secondary)); margin-bottom: var(--spacing-md); }
+        
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 var(--spacing-lg); }
+        
+        /* Nav */
+        nav { padding: var(--spacing-lg) 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid hsl(var(--border-dim)); margin-bottom: var(--spacing-xl); }
+        .logo { font-weight: 700; font-size: 1.25rem; display: flex; align-items: center; gap: var(--spacing-sm); text-decoration: none; color: hsl(var(--text-primary)); }
+        .logo svg { width: 24px; height: 24px; color: hsl(var(--accent)); }
+        
+        .nav-links { display: flex; gap: var(--spacing-lg); }
+        .nav-links a { color: hsl(var(--text-secondary)); text-decoration: none; font-size: 0.95rem; font-weight: 500; transition: color 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: hsl(var(--text-primary)); }
+
+        .code-block { background: hsl(var(--code-bg)); border: 1px solid hsl(var(--border-dim)); border-radius: var(--radius-md); padding: var(--spacing-md); overflow-x: auto; margin-bottom: var(--spacing-lg); }
+        pre { font-family: var(--font-mono); font-size: 0.9rem; color: hsl(var(--text-primary)); }
+        .comment { color: hsl(var(--text-secondary)); }
+        .command { color: hsl(var(--accent)); }
+        .arg { color: #A8B2D1; }
+
+        .table-wrap { overflow-x: auto; margin-bottom: var(--spacing-lg); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid hsl(var(--border-dim)); }
+        th { color: hsl(var(--text-primary)); font-weight: 600; }
+        td { color: hsl(var(--text-secondary)); }
+
+        footer { padding: var(--spacing-xl) 0; margin-top: var(--spacing-xl); border-top: 1px solid hsl(var(--border-dim)); text-align: center; color: hsl(var(--text-secondary)); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <nav>
+        <a href="index.html" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
+            Storage Bridge
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Overview</a>
+            <a href="docs.html" class="active">Documentation</a>
+            <a href="terminal.html">Virtual Terminal</a>
+            <a href="https://github.com/chriz-3656/storage-bridge" target="_blank">GitHub</a>
+        </div>
+    </nav>
+
+    <h1>Command Reference</h1>
+    <p>Storage Bridge provides a powerful, multi-layered CLI designed for both beginners and automation scripts.</p>
+
+    <h2>Stateful Navigation (Level 1)</h2>
+    <p>The CLI natively tracks your active cloud provider and working directory, allowing you to interact with clouds just like a local filesystem.</p>
+
+    <h3>cd</h3>
+    <p>Change your active directory within the default provider.</p>
+    <div class="code-block"><pre><code><span class="command">storage-bridge cd</span> <span class="arg">/my/backups/folder</span></code></pre></div>
+
+    <h3>list / ls</h3>
+    <p>List files in the current working directory.</p>
+    <div class="code-block"><pre><code><span class="command">storage-bridge list</span>
+<span class="command">storage-bridge list</span> <span class="arg">subfolder</span></code></pre></div>
+
+    <h3>mkdir</h3>
+    <p>Create a new folder in the active cloud environment.</p>
+    <div class="code-block"><pre><code><span class="command">storage-bridge mkdir</span> <span class="arg">new-folder</span></code></pre></div>
+
+    <h3>upload / download</h3>
+    <p>Seamlessly transfer files between your OS and the active cloud working directory.</p>
+    <div class="code-block"><pre><code><span class="command">storage-bridge upload</span> <span class="arg">local-file.txt</span>
+<span class="command">storage-bridge download</span> <span class="arg">cloud-file.txt</span> <span class="arg">./desktop/</span></code></pre></div>
+
+    <h2>Advanced Execution (Level 2)</h2>
+    <p>Power users can bypass the stateful working directory by explicitly defining <code>provider:path</code> arguments.</p>
+    
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Command</th><th>Description</th><th>Example</th></tr></thead>
+            <tbody>
+                <tr><td><code>put</code></td><td>Upload explicitly.</td><td><code>put ./file.txt s3:bucket/file.txt</code></td></tr>
+                <tr><td><code>get</code></td><td>Download explicitly.</td><td><code>get s3:bucket/file.txt ./file.txt</code></td></tr>
+                <tr><td><code>rm</code></td><td>Remove file entirely.</td><td><code>rm drive:/secrets/keys.txt</code></td></tr>
+                <tr><td><code>move</code></td><td>Rename or move natively.</td><td><code>move drive:/a.txt drive:/b.txt</code></td></tr>
+                <tr><td><code>sync</code></td><td>Concurrent directory sync.</td><td><code>sync local:./docs s3:my-docs --workers 8</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Provider Management</h2>
+    <p>Dynamically configure new storage connections.</p>
+    
+    <h3>Adding Amazon S3 (or R2 / Spaces)</h3>
+    <div class="code-block"><pre><code><span class="comment"># Standard AWS S3</span>
+<span class="command">storage-bridge provider add</span> <span class="arg">my-s3</span> <span class="command">--type</span> <span class="arg">s3</span> <span class="command">--bucket</span> <span class="arg">my-bucket</span>
+
+<span class="comment"># Cloudflare R2 via custom endpoint</span>
+<span class="command">storage-bridge provider add</span> <span class="arg">my-r2</span> <span class="command">--type</span> <span class="arg">s3</span> <span class="command">--bucket</span> <span class="arg">my-bucket</span> <span class="command">--endpoint</span> <span class="arg">https://id.r2.cloudflarestorage.com</span></code></pre></div>
+
+    <h3>Adding a Union Load Balancer</h3>
+    <p>Combine multiple upstream providers into one virtual endpoint.</p>
+    <div class="code-block"><pre><code><span class="command">storage-bridge provider add</span> <span class="arg">hybrid-cloud</span> <span class="command">--type</span> <span class="arg">union</span> <span class="command">--upstreams</span> <span class="arg">local,my-s3</span> <span class="command">--policy</span> <span class="arg">first</span></code></pre></div>
+
+    <footer>
+        <p>&copy; 2026 Storage Bridge. Open-Source Multi-Cloud Architecture.</p>
+    </footer>
+</div>
+
+</body>
+</html>
