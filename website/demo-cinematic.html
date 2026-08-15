@@ -310,18 +310,18 @@
             <!-- SCENE 08.5: AI AGENT MCP (NEW SCENE) -->
             <div class="scene" id="scene-85">
                 <!-- AI Agent representation -->
-                <div style="position: absolute; top: 300px; left: 960px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                <div style="position: absolute; top: 250px; left: 960px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 20px;">
                     <div style="background: var(--term-border); padding: 25px 50px; border-radius: 40px; font-size: 28px; font-style: italic; color: var(--text-main);">
                         "Find the Q3 report and back it up to S3."
                     </div>
                 </div>
                 
                 <!-- MCP Protocol Terminal -->
-                <div class="terminal" style="top: 650px; left: 960px; width: 1300px; font-size: 22px; color: var(--term-green); background: #080808;">
-                    <div id="mcp-1" style="opacity: 0; transform: translateY(10px); transition: all 0.4s;"><span class="prompt" style="color:var(--text-dim);">→</span> {"jsonrpc":"2.0","method":"list","params":{"remote":"local:Documents/"}}</div>
-                    <div id="mcp-2" style="margin-top: 15px; color: var(--text-dim); opacity: 0; transform: translateY(10px); transition: all 0.4s;"><span class="prompt">←</span> {"jsonrpc":"2.0","result":["Q3-report.pdf", "invoices/"]}</div>
-                    <div id="mcp-3" style="margin-top: 25px; opacity: 0; transform: translateY(10px); transition: all 0.4s;"><span class="prompt" style="color:var(--text-dim);">→</span> {"jsonrpc":"2.0","method":"copy","params":{"src":"local:Documents/Q3-report.pdf","dst":"s3:backups/"}}</div>
-                    <div id="mcp-4" style="margin-top: 15px; color: var(--text-dim); opacity: 0; transform: translateY(10px); transition: all 0.4s;"><span class="prompt">←</span> {"jsonrpc":"2.0","result":{"status":"success", "copied":1}}</div>
+                <div class="terminal" style="top: 600px; left: 960px; width: 1500px; font-size: 22px; color: var(--term-green); background: #080808; word-break: break-all;">
+                    <div id="mcp-1" style="opacity: 0; transform: translateY(10px); transition: all 0.4s;"><span class="prompt" style="color:var(--text-dim);">→</span> { "jsonrpc": "2.0", "method": "list", "params": { "remote": "local:Documents/" } }</div>
+                    <div id="mcp-2" style="margin-top: 15px; color: var(--text-dim); opacity: 0; transform: translateY(10px); transition: all 0.4s;"><span class="prompt">←</span> { "jsonrpc": "2.0", "result": ["Q3-report.pdf", "invoices/"] }</div>
+                    <div id="mcp-3" style="margin-top: 25px; opacity: 0; transform: translateY(10px); transition: all 0.4s;"><span class="prompt" style="color:var(--text-dim);">→</span> { "jsonrpc": "2.0", "method": "copy", "params": { "src": "local:Documents/Q3-report.pdf", "dst": "s3:backups/" } }</div>
+                    <div id="mcp-4" style="margin-top: 15px; color: var(--text-dim); opacity: 0; transform: translateY(10px); transition: all 0.4s;"><span class="prompt">←</span> { "jsonrpc": "2.0", "result": { "status": "success", "copied": 1 } }</div>
                 </div>
 
                 <div class="kinetic-text" id="text-85" style="position: absolute; bottom: 10%; width: 100%; text-align: center; opacity: 0; font-size: 36px; color: var(--text-main); transition: opacity 1s;">NATIVE MCP SUPPORT.</div>
