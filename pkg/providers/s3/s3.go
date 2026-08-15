@@ -229,7 +229,7 @@ func (p *Provider) Mkdir(ctx context.Context, path string) error {
 	
 	_, err := p.client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket: aws.String(p.bucket),
-		Key:    aws.String(p.prefix + path),
+		Key:    aws.String(path),
 		Body:   bytes.NewReader([]byte{}),
 	})
 	return err
@@ -239,8 +239,8 @@ func (p *Provider) Move(ctx context.Context, src string, dest string) error {
 	src = strings.TrimPrefix(src, "/")
 	dest = strings.TrimPrefix(dest, "/")
 	
-	srcKey := p.prefix + src
-	destKey := p.prefix + dest
+	srcKey := src
+	destKey := dest
 	
 	// Try to copy single object
 	_, err := p.client.CopyObject(ctx, &s3.CopyObjectInput{
