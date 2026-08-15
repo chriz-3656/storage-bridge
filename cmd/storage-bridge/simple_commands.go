@@ -461,6 +461,7 @@ func initSimpleCommands() {
 	rootCmd.AddCommand(simpleCdCmd)
 	rootCmd.AddCommand(simplePwdCmd)
 	rootCmd.AddCommand(promptCmd)
+	rootCmd.AddCommand(shellCmd)
 	
 	defaultCmd.AddCommand(defaultSetCmd)
 	rootCmd.AddCommand(defaultCmd)
