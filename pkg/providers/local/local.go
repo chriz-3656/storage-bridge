@@ -204,3 +204,29 @@ func (p *Provider) SpaceUsed(ctx context.Context, path string) (int64, error) {
 
 	return total, err
 }
+
+func (p *Provider) Mkdir(ctx context.Context, path string) error {
+	fullPath, err := p.resolve(path)
+	if err != nil {
+		return err
+	}
+	return os.MkdirAll(fullPath, 0755)
+}
+
+func (p *Provider) Move(ctx context.Context, src string, dest string) error {
+	fullSrc, err := p.resolve(src)
+	if err != nil {
+		return err
+	}
+	fullDest, err := p.resolve(dest)
+	if err != nil {
+		return err
+	}
+	
+	// Create parent directory for destination if it doesn't exist
+	if err := os.MkdirAll(filepath.Dir(fullDest), 0755); err != nil {
+		return err
+	}
+	
+	return os.Rename(fullSrc, fullDest)
+}
