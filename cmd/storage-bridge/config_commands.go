@@ -90,6 +90,51 @@ var providerAddCmd = &cobra.Command{
 	},
 }
 
+var providerRemoveCmd = &cobra.Command{
+	Use:   "remove [name]",
+	Short: "Remove a named provider",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		name := args[0]
+		cfgMgr, err := config.NewManager()
+		if err != nil {
+			return err
+		}
+		
+		if _, exists := cfgMgr.Data.Providers[name]; !exists {
+			return fmt.Errorf("provider '%s' not found", name)
+		}
+		
+		delete(cfgMgr.Data.Providers, name)
+		
+		if cfgMgr.Data.DefaultProvider == name {
+			cfgMgr.Data.DefaultProvider = ""
+		}
+		
+		if err := cfgMgr.Save(); err != nil {
+			return err
+		}
+		fmt.Printf("Successfully removed provider '%s'\n", name)
+		return nil
+	},
+}
+
+var providerListCmd = &cobra.Command{
+	Use:   "list",
+	Short: "List all named providers",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		cfgMgr, err := config.NewManager()
+		if err != nil {
+			return err
+		}
+		fmt.Println("Configured providers:")
+		for name, pConf := range cfgMgr.Data.Providers {
+			fmt.Printf("- %s (Type: %s)\n", name, pConf.Type)
+		}
+		return nil
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(authCmd)
 	authCmd.AddCommand(authLoginCmd)
@@ -98,4 +143,6 @@ func init() {
 	providerAddCmd.Flags().String("account", "", "Auth account name (e.g. google)")
 	rootCmd.AddCommand(providerCmd)
 	providerCmd.AddCommand(providerAddCmd)
+	providerCmd.AddCommand(providerRemoveCmd)
+	providerCmd.AddCommand(providerListCmd)
 }
