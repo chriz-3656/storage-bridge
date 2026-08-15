@@ -23,6 +23,7 @@ import (
 	"github.com/storage-bridge/core/pkg/providers/local"
 	"github.com/storage-bridge/core/pkg/providers/memory"
 	"github.com/storage-bridge/core/pkg/providers/s3"
+	"github.com/storage-bridge/core/pkg/providers/union"
 	"github.com/storage-bridge/core/pkg/storage"
 )
 
@@ -45,6 +46,23 @@ func resolveProvider(target string) (storage.Provider, string, error) {
 	if err == nil {
 		if pConf, ok := cfgMgr.Data.Providers[providerName]; ok {
 			switch pConf.Type {
+			case "union":
+				upstreamsStr := pConf.Params["upstreams"]
+				policyStr := pConf.Params["policy"]
+				var upstreams []storage.Provider
+				for _, upName := range strings.Split(upstreamsStr, ",") {
+					upName = strings.TrimSpace(upName)
+					if upName == "" {
+						continue
+					}
+					upProv, _, err := resolveProvider(upName + ":/")
+					if err != nil {
+						return nil, "", fmt.Errorf("failed to resolve union upstream '%s': %v", upName, err)
+					}
+					upstreams = append(upstreams, upProv)
+				}
+				provider := union.New(upstreams, union.Policy(policyStr))
+				return provider, path, nil
 			case "drive":
 				account := pConf.Params["account"]
 				tokRaw, ok := cfgMgr.Data.Auths[account]
@@ -68,6 +86,26 @@ func resolveProvider(target string) (storage.Provider, string, error) {
 					return nil, "", err
 				}
 				return provider, path, nil
+			case "local":
+				cwd, err := os.Getwd()
+				if err != nil {
+					return nil, "", err
+				}
+				provider, err := local.New(cwd)
+				if err != nil {
+					return nil, "", err
+				}
+				return provider, path, nil
+			case "memory":
+				return memProvider, path, nil
+			case "s3":
+				bucket := pConf.Params["bucket"]
+				cfg, err := config.LoadDefaultConfig(context.Background())
+				if err != nil {
+					return nil, "", err
+				}
+				client := s3sdk.NewFromConfig(cfg)
+				return s3.New(client, bucket), path, nil
 			}
 		}
 	}

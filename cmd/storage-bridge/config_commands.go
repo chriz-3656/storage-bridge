@@ -65,6 +65,9 @@ var providerAddCmd = &cobra.Command{
 		name := args[0]
 		pType, _ := cmd.Flags().GetString("type")
 		account, _ := cmd.Flags().GetString("account")
+		upstreams, _ := cmd.Flags().GetString("upstreams")
+		policy, _ := cmd.Flags().GetString("policy")
+		bucket, _ := cmd.Flags().GetString("bucket")
 		
 		if pType == "" {
 			return fmt.Errorf("--type is required")
@@ -78,7 +81,10 @@ var providerAddCmd = &cobra.Command{
 		cfgMgr.Data.Providers[name] = config.ProviderConfig{
 			Type: pType,
 			Params: map[string]string{
-				"account": account,
+				"account":   account,
+				"upstreams": upstreams,
+				"policy":    policy,
+				"bucket":    bucket,
 			},
 		}
 		
@@ -185,8 +191,12 @@ func init() {
 	rootCmd.AddCommand(authCmd)
 	authCmd.AddCommand(authLoginCmd)
 	
-	providerAddCmd.Flags().String("type", "", "Provider type (e.g. drive, s3, local)")
+	providerAddCmd.Flags().String("type", "", "Provider type (e.g. drive, s3, local, union)")
 	providerAddCmd.Flags().String("account", "", "Auth account name (e.g. google)")
+	providerAddCmd.Flags().String("upstreams", "", "Comma separated list of upstream provider names (for union)")
+	providerAddCmd.Flags().String("policy", "", "Union policy (e.g. first, all)")
+	providerAddCmd.Flags().String("bucket", "", "Bucket name (for s3)")
+	
 	rootCmd.AddCommand(providerCmd)
 	providerCmd.AddCommand(providerAddCmd)
 	providerCmd.AddCommand(providerRemoveCmd)
