@@ -131,8 +131,6 @@ func init() {
 	rootCmd.AddCommand(rmCmd)
 	rootCmd.AddCommand(statCmd)
 	rootCmd.AddCommand(mcpCmd)
-	rootCmd.AddCommand(mkdirCmd)
-	rootCmd.AddCommand(mvCmd)
 }
 
 var lsCmd = &cobra.Command{
