@@ -18,13 +18,15 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24'
+          go-version: '1.22'
 
       - name: Build Artifacts
         run: |
           mkdir -p build
           
-          go mod download
+          # Force go module to 1.22 to match the runner and prevent toolchain download issues
+          go mod edit -go=1.22
+          go mod tidy
           
           echo "Building for Linux..."
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o build/storage-bridge-linux-amd64 ./cmd/storage-bridge
