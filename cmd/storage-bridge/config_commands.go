@@ -135,6 +135,52 @@ var providerListCmd = &cobra.Command{
 	},
 }
 
+var providerShowCmd = &cobra.Command{
+	Use:   "show [name]",
+	Short: "Show details of a named provider",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		name := args[0]
+		cfgMgr, err := config.NewManager()
+		if err != nil {
+			return err
+		}
+		
+		pConf, exists := cfgMgr.Data.Providers[name]
+		if !exists {
+			return fmt.Errorf("provider '%s' not found", name)
+		}
+		
+		b, err := json.MarshalIndent(pConf, "", "  ")
+		if err != nil {
+			return err
+		}
+		fmt.Printf("Provider: %s\n%s\n", name, string(b))
+		return nil
+	},
+}
+
+var providerTestCmd = &cobra.Command{
+	Use:   "test [name]",
+	Short: "Test a named provider's connection",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		name := args[0]
+		provider, _, err := resolveProvider(name + ":/")
+		if err != nil {
+			return fmt.Errorf("✗ Failed to resolve provider: %v", err)
+		}
+		
+		_, err = provider.List(context.Background(), "/")
+		if err != nil {
+			return fmt.Errorf("✗ Connection test failed: %v", err)
+		}
+		
+		fmt.Printf("✓ Provider '%s' is working correctly!\n", name)
+		return nil
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(authCmd)
 	authCmd.AddCommand(authLoginCmd)
@@ -145,4 +191,6 @@ func init() {
 	providerCmd.AddCommand(providerAddCmd)
 	providerCmd.AddCommand(providerRemoveCmd)
 	providerCmd.AddCommand(providerListCmd)
+	providerCmd.AddCommand(providerShowCmd)
+	providerCmd.AddCommand(providerTestCmd)
 }
