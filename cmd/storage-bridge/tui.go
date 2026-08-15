@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	storagebridgeconfig "github.com/storage-bridge/core/pkg/config"
 	"github.com/storage-bridge/core/pkg/storage"
 )
 
@@ -17,10 +18,18 @@ func runTUI() error {
 	// Default to "local:." and "memory:/" if empty
 	envTargets := os.Getenv("SB_TARGETS")
 	var targets []string
-	if envTargets == "" {
-		targets = []string{"local:.", "memory:/"}
-	} else {
+	if envTargets != "" {
 		targets = strings.Split(envTargets, " ")
+	} else {
+		cfgMgr, err := storagebridgeconfig.NewManager()
+		if err == nil && len(cfgMgr.Data.Providers) > 0 {
+			for name := range cfgMgr.Data.Providers {
+				targets = append(targets, name+":/")
+			}
+		} else {
+			fmt.Println("No cloud providers connected.\n\nRun:\n\n  storage-bridge login")
+			return nil
+		}
 	}
 
 	providers := make(map[string]storage.Provider)

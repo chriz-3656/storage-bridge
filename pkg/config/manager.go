@@ -12,8 +12,9 @@ type Manager struct {
 }
 
 type ConfigData struct {
-	Auths     map[string]json.RawMessage `json:"auths"`
-	Providers map[string]ProviderConfig  `json:"providers"`
+	DefaultProvider string                    `json:"default_provider"`
+	Auths           map[string]json.RawMessage `json:"auths"`
+	Providers       map[string]ProviderConfig  `json:"providers"`
 }
 
 type ProviderConfig struct {
