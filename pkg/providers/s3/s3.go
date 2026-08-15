@@ -2,6 +2,7 @@ package s3
 
 import (
 	"context"
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -215,4 +216,45 @@ func (p *Provider) SpaceUsed(ctx context.Context, path string) (int64, error) {
 	}
 
 	return total, nil
+}
+
+func (p *Provider) Mkdir(ctx context.Context, path string) error {
+	path = strings.TrimPrefix(path, "/")
+	if path == "" {
+		return nil
+	}
+	if !strings.HasSuffix(path, "/") {
+		path += "/"
+	}
+	
+	_, err := p.client.PutObject(ctx, &s3.PutObjectInput{
+		Bucket: aws.String(p.bucket),
+		Key:    aws.String(p.prefix + path),
+		Body:   bytes.NewReader([]byte{}),
+	})
+	return err
+}
+
+func (p *Provider) Move(ctx context.Context, src string, dest string) error {
+	src = strings.TrimPrefix(src, "/")
+	dest = strings.TrimPrefix(dest, "/")
+	
+	srcKey := p.prefix + src
+	destKey := p.prefix + dest
+	
+	// Try to copy single object
+	_, err := p.client.CopyObject(ctx, &s3.CopyObjectInput{
+		Bucket:     aws.String(p.bucket),
+		CopySource: aws.String(p.bucket + "/" + srcKey),
+		Key:        aws.String(destKey),
+	})
+	
+	if err == nil {
+		// If single object copy succeeded, delete the original
+		return p.Remove(ctx, src)
+	}
+	
+	// If it failed, it might be a directory. We'd have to list and copy all objects.
+	// For simplicity in this engine, we'll return an error that directory moves aren't fully supported in S3 without a recursive walk.
+	return fmt.Errorf("directory move or copy error: %v", err)
 }

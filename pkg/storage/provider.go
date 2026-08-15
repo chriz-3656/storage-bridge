@@ -15,6 +15,8 @@ type Provider interface {
 	Put(ctx context.Context, path string, in io.Reader, size int64, modTime time.Time) error
 	Remove(ctx context.Context, path string) error
 	SpaceUsed(ctx context.Context, path string) (int64, error)
+	Mkdir(ctx context.Context, path string) error
+	Move(ctx context.Context, src string, dest string) error
 }
 
 type Entry struct {

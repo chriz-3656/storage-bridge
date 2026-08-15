@@ -198,3 +198,46 @@ func (p *Provider) SpaceUsed(ctx context.Context, path string) (int64, error) {
 	}
 	return total, nil
 }
+
+func (p *Provider) Mkdir(ctx context.Context, path string) error {
+	path = strings.TrimPrefix(path, "/")
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.files[path] = &memFile{
+		data:    nil,
+		modTime: time.Now(),
+		isDir:   true,
+	}
+	return nil
+}
+
+func (p *Provider) Move(ctx context.Context, src string, dest string) error {
+	src = strings.TrimPrefix(src, "/")
+	dest = strings.TrimPrefix(dest, "/")
+	
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	
+	f, ok := p.files[src]
+	if !ok {
+		// Could be a prefix rename (moving a directory)
+		prefix := src + "/"
+		moved := false
+		for k, v := range p.files {
+			if strings.HasPrefix(k, prefix) {
+				newPath := dest + "/" + strings.TrimPrefix(k, prefix)
+				p.files[newPath] = v
+				delete(p.files, k)
+				moved = true
+			}
+		}
+		if !moved {
+			return storage.ErrNotFound
+		}
+		return nil
+	}
+	
+	p.files[dest] = f
+	delete(p.files, src)
+	return nil
+}

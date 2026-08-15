@@ -311,3 +311,63 @@ func (p *Provider) SpaceUsed(ctx context.Context, path string) (int64, error) {
 	}
 	return about.StorageQuota.Usage, nil
 }
+
+func (p *Provider) Mkdir(ctx context.Context, path string) error {
+	path = strings.TrimPrefix(path, "/")
+	if path == "" {
+		return nil
+	}
+	parentId, dirName, err := p.ensurePath(path)
+	if err != nil {
+		return err
+	}
+	
+	query := fmt.Sprintf("'%s' in parents and name='%s' and mimeType='application/vnd.google-apps.folder' and trashed=false", parentId, dirName)
+	r, err := p.srv.Files.List().Q(query).Fields("files(id)").Do()
+	if err != nil {
+		return err
+	}
+	
+	if len(r.Files) > 0 {
+		return nil // already exists
+	}
+	
+	folder := &driveapi.File{
+		Name:     dirName,
+		MimeType: "application/vnd.google-apps.folder",
+		Parents:  []string{parentId},
+	}
+	_, err = p.srv.Files.Create(folder).Fields("id").Do()
+	return err
+}
+
+func (p *Provider) Move(ctx context.Context, src string, dest string) error {
+	srcId, err := p.resolvePath(src)
+	if err != nil {
+		return err
+	}
+	
+	destParentId, destName, err := p.ensurePath(dest)
+	if err != nil {
+		return err
+	}
+	
+	f, err := p.srv.Files.Get(srcId).Fields("parents").Do()
+	if err != nil {
+		return err
+	}
+	
+	previousParents := strings.Join(f.Parents, ",")
+	
+	update := &driveapi.File{
+		Name: destName,
+	}
+	
+	_, err = p.srv.Files.Update(srcId, update).
+		AddParents(destParentId).
+		RemoveParents(previousParents).
+		Fields("id, parents").
+		Do()
+		
+	return err
+}

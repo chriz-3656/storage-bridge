@@ -131,6 +131,8 @@ func init() {
 	rootCmd.AddCommand(rmCmd)
 	rootCmd.AddCommand(statCmd)
 	rootCmd.AddCommand(mcpCmd)
+	rootCmd.AddCommand(mkdirCmd)
+	rootCmd.AddCommand(mvCmd)
 }
 
 var lsCmd = &cobra.Command{
@@ -253,5 +255,38 @@ var statCmd = &cobra.Command{
 		}
 		fmt.Printf("Path: %s\nIsDir: %v\nSize: %d\nModTime: %s\n", entry.Path, entry.IsDir, entry.Size, entry.ModTime.Format(time.RFC3339))
 		return nil
+	},
+}
+
+var mkdirCmd = &cobra.Command{
+	Use:   "mkdir [target]",
+	Short: "Create a new directory",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		provider, path, err := resolveProvider(args[0])
+		if err != nil {
+			return err
+		}
+		return provider.Mkdir(context.Background(), path)
+	},
+}
+
+var mvCmd = &cobra.Command{
+	Use:   "mv [src] [dest]",
+	Short: "Move or rename a file or directory",
+	Args:  cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		srcProvider, srcPath, err := resolveProvider(args[0])
+		if err != nil {
+			return err
+		}
+		destProvider, destPath, err := resolveProvider(args[1])
+		if err != nil {
+			return err
+		}
+		if srcProvider.Name() != destProvider.Name() {
+			return fmt.Errorf("cross-provider moves are not supported yet")
+		}
+		return srcProvider.Move(context.Background(), srcPath, destPath)
 	},
 }

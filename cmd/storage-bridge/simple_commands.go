@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -34,12 +35,18 @@ func resolveSimpleTarget(target string, providerOverride string) string {
 		return target
 	}
 
-	path := target
-	if !strings.HasPrefix(path, "/") {
-		path = "/" + path
+	pathStr := target
+	if !strings.HasPrefix(pathStr, "/") {
+		cwd := "/"
+		if err == nil && cfgMgr.Data.DefaultProviderCwd != "" {
+			cwd = cfgMgr.Data.DefaultProviderCwd
+		}
+		// Use path.Join to clean and combine
+		// If target is empty, it returns just cwd
+		pathStr = path.Join(cwd, pathStr)
 	}
 
-	return defaultProv + ":" + path
+	return defaultProv + ":" + pathStr
 }
 
 var loginCmd = &cobra.Command{
@@ -327,6 +334,89 @@ var defaultSetCmd = &cobra.Command{
 	},
 }
 
+var simpleMkdirCmd = &cobra.Command{
+	Use:   "mkdir <directory>",
+	Short: "Create a new directory (simple)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		target := resolveSimpleTarget(args[0], "")
+		err := mkdirCmd.RunE(cmd, []string{target})
+		if err != nil {
+			return fmt.Errorf("✗ Mkdir failed: %v", err)
+		}
+		fmt.Println("✓ Directory created successfully")
+		return nil
+	},
+}
+
+var simpleMoveCmd = &cobra.Command{
+	Use:   "move <src> <dest>",
+	Aliases: []string{"rename"},
+	Short: "Move or rename a file/directory (simple)",
+	Args:  cobra.ExactArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		src := resolveSimpleTarget(args[0], "")
+		dest := resolveSimpleTarget(args[1], "")
+		err := mvCmd.RunE(cmd, []string{src, dest})
+		if err != nil {
+			return fmt.Errorf("✗ Move failed: %v", err)
+		}
+		fmt.Println("✓ Moved successfully")
+		return nil
+	},
+}
+
+var simpleCdCmd = &cobra.Command{
+	Use:   "cd <directory>",
+	Short: "Change current directory (simple)",
+	Args:  cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		cfgMgr, err := storagebridgeconfig.NewManager()
+		if err != nil {
+			return err
+		}
+		
+		targetDir := args[0]
+		
+		// Handle absolute vs relative
+		newCwd := ""
+		if strings.HasPrefix(targetDir, "/") {
+			newCwd = path.Clean(targetDir)
+		} else {
+			current := "/"
+			if cfgMgr.Data.DefaultProviderCwd != "" {
+				current = cfgMgr.Data.DefaultProviderCwd
+			}
+			newCwd = path.Join(current, targetDir)
+		}
+		
+		cfgMgr.Data.DefaultProviderCwd = newCwd
+		if err := cfgMgr.Save(); err != nil {
+			return fmt.Errorf("failed to save config: %v", err)
+		}
+		
+		fmt.Printf("✓ Changed directory to: %s\n", newCwd)
+		return nil
+	},
+}
+
+var simplePwdCmd = &cobra.Command{
+	Use:   "pwd",
+	Short: "Print working directory (simple)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		cfgMgr, err := storagebridgeconfig.NewManager()
+		if err != nil {
+			return err
+		}
+		cwd := "/"
+		if cfgMgr.Data.DefaultProviderCwd != "" {
+			cwd = cfgMgr.Data.DefaultProviderCwd
+		}
+		fmt.Printf("%s:/%s\n", cfgMgr.Data.DefaultProvider, strings.TrimPrefix(cwd, "/"))
+		return nil
+	},
+}
+
 func initSimpleCommands() {
 	rootCmd.PersistentFlags().Bool("json", false, "Output in JSON format")
 	
@@ -342,6 +432,10 @@ func initSimpleCommands() {
 	rootCmd.AddCommand(removeCmd)
 	rootCmd.AddCommand(providersCmd)
 	rootCmd.AddCommand(catCmd)
+	rootCmd.AddCommand(simpleMkdirCmd)
+	rootCmd.AddCommand(simpleMoveCmd)
+	rootCmd.AddCommand(simpleCdCmd)
+	rootCmd.AddCommand(simplePwdCmd)
 	
 	defaultCmd.AddCommand(defaultSetCmd)
 	rootCmd.AddCommand(defaultCmd)
