@@ -17,7 +17,7 @@ import (
 	
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
-	"google.golang.org/api/drive/v3"
+	driveapi "google.golang.org/api/drive/v3"
 
 	storagebridgeconfig "github.com/storage-bridge/core/pkg/config"
 	"github.com/storage-bridge/core/pkg/providers/drive"
@@ -67,7 +67,7 @@ func resolveProvider(target string) (storage.Provider, string, error) {
 					return nil, "", fmt.Errorf("unable to read client secret file: %v", err)
 				}
 			
-				conf, err := google.ConfigFromJSON(b, drive.DriveScope)
+				conf, err := google.ConfigFromJSON(b, driveapi.DriveScope)
 				if err != nil {
 					return nil, "", fmt.Errorf("unable to parse client secret file to config: %v", err)
 				}
@@ -114,7 +114,7 @@ func resolveProvider(target string) (storage.Provider, string, error) {
 		if err != nil {
 			return nil, "", fmt.Errorf("credentials.json not found")
 		}
-		conf, err := google.ConfigFromJSON(b, drive.DriveScope)
+		conf, err := google.ConfigFromJSON(b, driveapi.DriveScope)
 		if err != nil {
 			return nil, "", err
 		}

@@ -14,18 +14,18 @@ import (
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
-	"google.golang.org/api/drive/v3"
+	driveapi "google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
 
 	"github.com/storage-bridge/core/pkg/storage"
 )
 
 type Provider struct {
-	srv *drive.Service
+	srv *driveapi.Service
 }
 
 func New(ctx context.Context, client *http.Client) (*Provider, error) {
-	srv, err := drive.NewService(ctx, option.WithHTTPClient(client))
+	srv, err := driveapi.NewService(ctx, option.WithHTTPClient(client))
 	if err != nil {
 		return nil, fmt.Errorf("unable to retrieve Drive client: %v", err)
 	}
@@ -54,7 +54,7 @@ func AuthLogin(ctx context.Context, credentialsFile string) (*oauth2.Token, erro
 		return nil, fmt.Errorf("unable to read client secret file: %v", err)
 	}
 
-	config, err := google.ConfigFromJSON(b, drive.DriveScope)
+	config, err := google.ConfigFromJSON(b, driveapi.DriveScope)
 	if err != nil {
 		return nil, fmt.Errorf("unable to parse client secret file to config: %v", err)
 	}
@@ -160,7 +160,7 @@ func (p *Provider) Stat(ctx context.Context, path string) (*storage.Entry, error
 }
 
 type driveIterator struct {
-	files []*drive.File
+	files []*driveapi.File
 	index int
 }
 
@@ -244,7 +244,7 @@ func (p *Provider) ensurePath(path string) (string, string, error) {
 		
 		if len(r.Files) == 0 {
 			// Create folder
-			folder := &drive.File{
+			folder := &driveapi.File{
 				Name:     part,
 				MimeType: "application/vnd.google-apps.folder",
 				Parents:  []string{currentId},
@@ -275,7 +275,7 @@ func (p *Provider) Put(ctx context.Context, path string, in io.Reader, size int6
 		return err
 	}
 
-	f := &drive.File{
+	f := &driveapi.File{
 		Name:    fileName,
 		Parents: []string{parentId},
 	}
