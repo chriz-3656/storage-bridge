@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Storage Bridge</title>
+    <style>
+        :root {
+            --bg-base: 228 10% 4%; --bg-surface: 228 8% 8%; --bg-elevated: 228 8% 12%;
+            --text-primary: 0 0% 98%; --text-secondary: 228 10% 60%;
+            --accent: 210 100% 55%; --accent-hover: 210 100% 65%;
+            --border-dim: 228 8% 16%;
+            --spacing-md: 1rem; --spacing-lg: 2rem; --spacing-xl: 4rem;
+            --radius-md: 8px; --radius-lg: 12px;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-sans); background-color: hsl(var(--bg-base)); color: hsl(var(--text-primary)); line-height: 1.6; }
+        
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 var(--spacing-lg); }
+        h1 { font-size: 3rem; margin-bottom: 1rem; font-weight: 800; text-align: center; margin-top: 4rem; }
+        p.subtitle { text-align: center; color: hsl(var(--text-secondary)); font-size: 1.2rem; margin-bottom: 3rem; }
+
+        nav {
+            padding: var(--spacing-md) 0; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid hsla(var(--border-dim), 0.5); background: hsla(var(--bg-base), 0.8);
+        }
+        .logo { font-weight: 700; font-size: 1.25rem; display: flex; align-items: center; gap: var(--spacing-sm); text-decoration: none; color: white; }
+        .logo svg { width: 24px; height: 24px; color: hsl(var(--accent)); }
+        .nav-links { display: flex; gap: var(--spacing-lg); align-items: center; }
+        .nav-links a { color: hsl(var(--text-secondary)); text-decoration: none; font-size: 0.95rem; font-weight: 500; }
+        .nav-links a:hover, .nav-links a.active { color: hsl(var(--text-primary)); }
+
+        .dl-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 4rem; }
+        .dl-card {
+            background: hsl(var(--bg-surface)); border: 2px solid hsl(var(--border-dim));
+            border-radius: var(--radius-lg); padding: 2rem; text-align: center;
+            transition: transform 0.2s, border-color 0.2s; position: relative;
+        }
+        .dl-card.recommended { border-color: hsl(var(--accent)); box-shadow: 0 0 24px hsla(var(--accent), 0.2); }
+        .dl-card.recommended::before {
+            content: 'Recommended for you'; position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+            background: hsl(var(--accent)); color: white; font-size: 0.8rem; font-weight: bold; padding: 4px 12px; border-radius: 12px;
+        }
+        .dl-icon { width: 64px; height: 64px; margin-bottom: 1rem; fill: currentColor; }
+        .dl-card h2 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .dl-card p { color: hsl(var(--text-secondary)); font-size: 0.9rem; margin-bottom: 1.5rem; }
+        
+        .btn {
+            display: inline-block; width: 100%; padding: 12px; border-radius: var(--radius-md); font-weight: 600; text-decoration: none;
+            background: hsl(var(--bg-elevated)); color: hsl(var(--text-primary)); transition: background 0.2s; border: 1px solid hsl(var(--border-dim));
+        }
+        .btn:hover { background: hsl(var(--bg-surface)); }
+        .recommended .btn { background: hsl(var(--accent)); color: white; border: none; }
+        .recommended .btn:hover { background: hsl(var(--accent-hover)); }
+        
+        #status-msg { text-align: center; margin-bottom: 2rem; color: hsl(var(--text-secondary)); font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="container" style="display: flex; justify-content: space-between; width: 100%;">
+        <a href="index.html" class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
+            Storage Bridge
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Product</a>
+            <a href="terminal.html">Interactive Terminal</a>
+            <a href="docs.html">Docs</a>
+            <a href="download.html" class="active">Download</a>
+            <a href="https://github.com/chriz-3656/storage-bridge" target="_blank" style="padding: 8px 16px; border: 1px solid hsl(var(--border-dim)); border-radius: 8px;">GitHub</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <h1>Download Storage Bridge</h1>
+    <p class="subtitle">Single binary. Zero dependencies. Ready for the cloud.</p>
+    
+    <div id="status-msg">Scanning system architecture...</div>
+
+    <div class="dl-grid">
+        <!-- Windows -->
+        <div class="dl-card" id="card-windows">
+            <svg class="dl-icon" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+            <h2>Windows</h2>
+            <p>amd64 / x86_64</p>
+            <a href="https://github.com/chriz-3656/storage-bridge/releases/latest/download/storage-bridge-windows-amd64.exe" class="btn">Download .exe</a>
+        </div>
+        
+        <!-- macOS -->
+        <div class="dl-card" id="card-macos">
+            <svg class="dl-icon" viewBox="0 0 24 24"><path d="M12 20.208c-1.391 0-3.784-1.28-4.996-2.128-1.583-1.12-2.92-3.136-2.92-5.488 0-3.696 2.37-5.184 4.398-5.184 1.488 0 2.684.816 3.498.816.832 0 2.256-.88 4.015-.88 1.456 0 3.25.656 4.304 2.16-3.6 1.776-3.088 6.448.432 7.824-.8 2.064-2.176 4.192-3.92 4.192-1.344 0-2.224-.88-3.488-.88-1.312 0-2.32.96-3.323.96h-.024zM14.93 7.024c.72-1.024 1.232-2.352 1.088-3.728-1.152.064-2.672.768-3.52 1.712-.704.752-1.312 2.112-1.12 3.44 1.344.096 2.768-.448 3.552-1.424z"/></svg>
+            <h2>macOS</h2>
+            <p>Apple Silicon (arm64)</p>
+            <a href="https://github.com/chriz-3656/storage-bridge/releases/latest/download/storage-bridge-macos-arm64" class="btn" style="margin-bottom: 8px;">Download Apple Silicon</a>
+            <a href="https://github.com/chriz-3656/storage-bridge/releases/latest/download/storage-bridge-macos-amd64" class="btn" style="background:transparent; border-color:hsl(var(--border-dim)); font-weight:400;">Intel (amd64)</a>
+        </div>
+
+        <!-- Linux -->
+        <div class="dl-card" id="card-linux">
+            <svg class="dl-icon" viewBox="0 0 24 24"><path d="M11.968 1.62c-.63 0-1.107.135-1.422.384-.33.25-.494.622-.494 1.103 0 .493.176.877.53 1.144.354.267.892.41 1.603.41.677 0 1.203-.133 1.542-.39.34-.256.516-.628.516-1.102 0-.46-.17-.822-.505-1.077-.334-.254-.863-.393-1.574-.393zm-5.71 4.607c-.452 0-.8.1-.968.293-.167.192-.258.497-.258.895 0 .393.093.693.267.886.175.193.527.296 1.002.296.444 0 .783-.1.956-.288.173-.187.266-.48.266-.867 0-.41-.09-.723-.266-.92-.175-.198-.532-.315-1.01-.315zm11.398.055c-.463 0-.82.112-.99.307-.17.195-.26.505-.26.906 0 .39.09.687.262.88.172.193.518.294.974.294.475 0 .835-.1.996-.286.16-.186.246-.48.246-.868 0-.407-.087-.723-.257-.923-.17-.2-.516-.312-1-.31zm-6.284 3.033c-2.3 0-4.07 1.07-5.068 3.107-.63 1.282-.676 2.378-.656 2.56.247.054 2.115-.418 5.485-.418h.203l-.008.016h.227c2.97 0 4.69.467 4.93.415-.148-.266-.546-1.39-1.223-2.618-.948-1.716-2.483-3.052-3.89-3.052zm-3.064 4.545c.427 0 .775.483.775 1.082 0 .6-.348 1.084-.775 1.084-.428 0-.776-.485-.776-1.084 0-.6.348-1.082.776-1.082zm6.275 0c.428 0 .776.483.776 1.082 0 .6-.348 1.084-.776 1.084-.427 0-.775-.485-.775-1.084 0-.6.348-1.082.775-1.082zm-3.045 1.838c-.378.006-.778.026-1.197.06h.002c-3.535.263-5.05 1.516-5.093 3.328-.013.567.147 1.107.5 1.58.423.57 1.137 1.066 2.146 1.488.75.314 1.666.578 2.766.784.815.153 1.866.255 3.033.255.977 0 1.936-.084 2.805-.236h-.002c.983-.174 1.833-.426 2.533-.746 1.144-.523 1.92-1.096 2.307-1.725.335-.544.47-1.082.44-1.638-.06-1.134-.73-2.023-1.89-2.527-1.306-.566-3.26-.8-5.753-.8-.863 0-1.728.06-2.597.177z"/></svg>
+            <h2>Linux</h2>
+            <p>amd64 / arm64</p>
+            <a href="https://github.com/chriz-3656/storage-bridge/releases/latest/download/storage-bridge-linux-amd64" class="btn" style="margin-bottom: 8px;">Download amd64</a>
+            <a href="https://github.com/chriz-3656/storage-bridge/releases/latest/download/storage-bridge-linux-arm64" class="btn" style="background:transparent; border-color:hsl(var(--border-dim)); font-weight:400;">arm64</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const ua = navigator.userAgent;
+        let os = "Unknown";
+        if (ua.indexOf("Win") !== -1) os = "Windows";
+        if (ua.indexOf("Mac") !== -1) os = "MacOS";
+        if (ua.indexOf("Linux") !== -1) os = "Linux";
+        
+        const statusMsg = document.getElementById("status-msg");
+        if (os !== "Unknown") {
+            statusMsg.innerHTML = `Detected architecture: <strong style="color:hsl(var(--accent));">${os}</strong>. Showing recommended download.`;
+        } else {
+            statusMsg.innerHTML = "Select your operating system below.";
+        }
+
+        if (os === "Windows") {
+            document.getElementById("card-windows").classList.add("recommended");
+        } else if (os === "MacOS") {
+            document.getElementById("card-macos").classList.add("recommended");
+        } else if (os === "Linux") {
+            document.getElementById("card-linux").classList.add("recommended");
+        }
+    });
+</script>
+</body>
+</html>
