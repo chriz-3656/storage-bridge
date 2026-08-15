@@ -76,3 +76,12 @@ The foundation is fully built and highly polished! You have successfully laid do
 
 **Next Major Priority**:
 - **Phase 6: The Routing / Union Engine**. Now that the providers are fully functional individually, the engine must support combining multiple providers together (e.g., Unioning local and cloud storage into a single directory, or dynamically load-balancing uploads based on available free space).
+
+## Phase 6 & Phase 7 Updates
+- **Union Provider (Phase 6 MVP):** Implemented `pkg/providers/union` which acts as a meta-provider, merging multiple upstreams. Created an advanced `unionIterator` that properly deduplicates files when listing across providers.
+- **MCP Server Upgrade:** Re-architected the MCP JSON-RPC server. AI Agents can now use `resolveSimpleTarget` (so they inherit the user's `DefaultProviderCwd`), and two new tools (`make_directory`, `move_file`) were added. The `tools/list` initialization handshake was successfully implemented for perfect MCP compliance.
+- **Sync Engine (Phase 7):** Designed a high-performance, concurrent differential sync engine in `cmd/storage-bridge/sync.go`.
+  - Spawns an `errgroup` / `WaitGroup` multi-worker pipeline.
+  - Lists the target destination in-memory to calculate a file diff based on path and file size.
+  - Intelligently skips files that are already identical on the destination, saving massive bandwidth.
+  - Multipart chunked uploads are natively supported by the underlying AWS SDK V2 `manager.Uploader`.
