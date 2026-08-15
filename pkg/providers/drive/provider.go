@@ -2,12 +2,13 @@ package drive
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -23,7 +24,31 @@ type Provider struct {
 	srv *drive.Service
 }
 
-func New(ctx context.Context, credentialsFile string, tokenFile string) (*Provider, error) {
+func New(ctx context.Context, client *http.Client) (*Provider, error) {
+	srv, err := drive.NewService(ctx, option.WithHTTPClient(client))
+	if err != nil {
+		return nil, fmt.Errorf("unable to retrieve Drive client: %v", err)
+	}
+
+	return &Provider{srv: srv}, nil
+}
+
+func OpenBrowser(url string) error {
+	var err error
+	switch runtime.GOOS {
+	case "linux":
+		err = exec.Command("xdg-open", url).Start()
+	case "windows":
+		err = exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+	case "darwin":
+		err = exec.Command("open", url).Start()
+	default:
+		err = fmt.Errorf("unsupported platform")
+	}
+	return err
+}
+
+func AuthLogin(ctx context.Context, credentialsFile string) (*oauth2.Token, error) {
 	b, err := os.ReadFile(credentialsFile)
 	if err != nil {
 		return nil, fmt.Errorf("unable to read client secret file: %v", err)
@@ -34,70 +59,52 @@ func New(ctx context.Context, credentialsFile string, tokenFile string) (*Provid
 		return nil, fmt.Errorf("unable to parse client secret file to config: %v", err)
 	}
 
-	client, err := getClient(ctx, config, tokenFile)
-	if err != nil {
-		return nil, err
-	}
-
-	srv, err := drive.NewService(ctx, option.WithHTTPClient(client))
-	if err != nil {
-		return nil, fmt.Errorf("unable to retrieve Drive client: %v", err)
-	}
-
-	return &Provider{srv: srv}, nil
-}
-
-// Retrieve a token, saves the token, then returns the generated client.
-func getClient(ctx context.Context, config *oauth2.Config, tokenFile string) (*http.Client, error) {
-	tok, err := tokenFromFile(tokenFile)
-	if err != nil {
-		// If token file doesn't exist, we would normally run OAuth flow here.
-		// For a CLI tool, this involves printing a URL and asking for auth code.
-		tok, err = getTokenFromWeb(ctx, config)
-		if err != nil {
-			return nil, err
-		}
-		saveToken(tokenFile, tok)
-	}
-	return config.Client(ctx, tok), nil
-}
-
-func getTokenFromWeb(ctx context.Context, config *oauth2.Config) (*oauth2.Token, error) {
+	config.RedirectURL = "http://localhost:8080/oauth2callback"
 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
-	fmt.Printf("Go to the following link in your browser then type the authorization code: \n%v\n", authURL)
+
+	fmt.Printf("Opening browser to authorize Google Drive...\nIf the browser does not open manually click this link:\n%v\n", authURL)
+	_ = OpenBrowser(authURL)
+
+	codeCh := make(chan string)
+	errCh := make(chan error)
+
+	mux := http.NewServeMux()
+	server := &http.Server{Addr: ":8080", Handler: mux}
+
+	mux.HandleFunc("/oauth2callback", func(w http.ResponseWriter, r *http.Request) {
+		code := r.URL.Query().Get("code")
+		if code == "" {
+			fmt.Fprintln(w, "Authentication failed! No code provided.")
+			errCh <- fmt.Errorf("no code in callback")
+			return
+		}
+		fmt.Fprintln(w, "Authentication successful! You can close this window and return to the terminal.")
+		codeCh <- code
+	})
+
+	go func() {
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			errCh <- err
+		}
+	}()
 
 	var authCode string
-	if _, err := fmt.Scan(&authCode); err != nil {
-		return nil, fmt.Errorf("unable to read authorization code: %v", err)
+	select {
+	case authCode = <-codeCh:
+		// success
+	case err := <-errCh:
+		return nil, err
+	case <-time.After(3 * time.Minute):
+		return nil, fmt.Errorf("timed out waiting for authentication")
 	}
+
+	server.Shutdown(context.Background())
 
 	tok, err := config.Exchange(ctx, authCode)
 	if err != nil {
 		return nil, fmt.Errorf("unable to retrieve token from web: %v", err)
 	}
 	return tok, nil
-}
-
-func tokenFromFile(file string) (*oauth2.Token, error) {
-	f, err := os.Open(file)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	tok := &oauth2.Token{}
-	err = json.NewDecoder(f).Decode(tok)
-	return tok, err
-}
-
-func saveToken(path string, token *oauth2.Token) {
-	fmt.Printf("Saving credential file to: %s\n", path)
-	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
-	if err != nil {
-		fmt.Printf("Unable to cache oauth token: %v\n", err)
-		return
-	}
-	defer f.Close()
-	json.NewEncoder(f).Encode(token)
 }
 
 func (p *Provider) Name() string {

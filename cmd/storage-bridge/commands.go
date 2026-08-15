@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -12,7 +14,12 @@ import (
 	
 	"github.com/aws/aws-sdk-go-v2/config"
 	s3sdk "github.com/aws/aws-sdk-go-v2/service/s3"
+	
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/drive/v3"
 
+	storagebridgeconfig "github.com/storage-bridge/core/pkg/config"
 	"github.com/storage-bridge/core/pkg/providers/drive"
 	"github.com/storage-bridge/core/pkg/providers/local"
 	"github.com/storage-bridge/core/pkg/providers/memory"
@@ -25,6 +32,7 @@ var (
 )
 
 // resolveProvider parses a connection string like "memory:/path/to/file" or "local:/path/to/file"
+// It also checks the global config for named providers like "gdrive:/"
 func resolveProvider(target string) (storage.Provider, string, error) {
 	parts := strings.SplitN(target, ":", 2)
 	if len(parts) != 2 {
@@ -33,6 +41,46 @@ func resolveProvider(target string) (storage.Provider, string, error) {
 	
 	providerName := parts[0]
 	path := parts[1]
+	
+	cfgMgr, err := storagebridgeconfig.NewManager()
+	if err == nil {
+		if pConf, ok := cfgMgr.Data.Providers[providerName]; ok {
+			switch pConf.Type {
+			case "drive":
+				account := pConf.Params["account"]
+				tokRaw, ok := cfgMgr.Data.Auths[account]
+				if !ok {
+					return nil, "", fmt.Errorf("auth account '%s' not found", account)
+				}
+				var tok oauth2.Token
+				if err := json.Unmarshal(tokRaw, &tok); err != nil {
+					return nil, "", err
+				}
+				
+				credsPath := "credentials.json"
+				if _, err := os.Stat(credsPath); os.IsNotExist(err) {
+					credsPath = filepath.Join(filepath.Dir(cfgMgr.Path), "credentials.json")
+				}
+				
+				b, err := os.ReadFile(credsPath)
+				if err != nil {
+					return nil, "", fmt.Errorf("unable to read client secret file: %v", err)
+				}
+			
+				conf, err := google.ConfigFromJSON(b, drive.DriveScope)
+				if err != nil {
+					return nil, "", fmt.Errorf("unable to parse client secret file to config: %v", err)
+				}
+				
+				client := conf.Client(context.Background(), &tok)
+				provider, err := drive.New(context.Background(), client)
+				if err != nil {
+					return nil, "", err
+				}
+				return provider, path, nil
+			}
+		}
+	}
 	
 	switch providerName {
 	case "memory":
@@ -62,7 +110,23 @@ func resolveProvider(target string) (storage.Provider, string, error) {
 		client := s3sdk.NewFromConfig(cfg)
 		return s3.New(client, bucket), key, nil
 	case "drive":
-		provider, err := drive.New(context.Background(), "credentials.json", "token.json")
+		b, err := os.ReadFile("credentials.json")
+		if err != nil {
+			return nil, "", fmt.Errorf("credentials.json not found")
+		}
+		conf, err := google.ConfigFromJSON(b, drive.DriveScope)
+		if err != nil {
+			return nil, "", err
+		}
+		tokRaw, err := os.ReadFile("token.json")
+		if err != nil {
+			return nil, "", fmt.Errorf("token.json not found. Run 'auth login google' first")
+		}
+		var tok oauth2.Token
+		json.Unmarshal(tokRaw, &tok)
+		
+		client := conf.Client(context.Background(), &tok)
+		provider, err := drive.New(context.Background(), client)
 		if err != nil {
 			return nil, "", err
 		}
