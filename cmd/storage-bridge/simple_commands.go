@@ -417,6 +417,30 @@ var simplePwdCmd = &cobra.Command{
 	},
 }
 
+var promptCmd = &cobra.Command{
+	Use:   "prompt",
+	Short: "Print a shell prompt string",
+	Hidden: true,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		cfgMgr, err := storagebridgeconfig.NewManager()
+		if err != nil {
+			return nil
+		}
+		
+		if cfgMgr.Data.DefaultProvider == "" {
+			return nil
+		}
+		
+		cwd := "/"
+		if cfgMgr.Data.DefaultProviderCwd != "" {
+			cwd = cfgMgr.Data.DefaultProviderCwd
+		}
+		
+		fmt.Printf("[%s:/%s] ", cfgMgr.Data.DefaultProvider, strings.TrimPrefix(cwd, "/"))
+		return nil
+	},
+}
+
 func initSimpleCommands() {
 	rootCmd.PersistentFlags().Bool("json", false, "Output in JSON format")
 	
@@ -436,6 +460,7 @@ func initSimpleCommands() {
 	rootCmd.AddCommand(simpleMoveCmd)
 	rootCmd.AddCommand(simpleCdCmd)
 	rootCmd.AddCommand(simplePwdCmd)
+	rootCmd.AddCommand(promptCmd)
 	
 	defaultCmd.AddCommand(defaultSetCmd)
 	rootCmd.AddCommand(defaultCmd)
