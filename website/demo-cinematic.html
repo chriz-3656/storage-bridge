@@ -48,13 +48,14 @@
             transition: transform 1.5s cubic-bezier(0.65, 0, 0.35, 1);
         }
 
-        /* Scene Container - Directional Smooth Movement */
+        /* Scene Container - Fast, Clean Directional Movement */
         .scene {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             opacity: 0; pointer-events: none;
+            display: none; /* Strictly prevents overlapping */
             transform: scale(0.9) translateY(100px);
-            transition: all 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+            transition: all 0.6s cubic-bezier(0.65, 0, 0.35, 1);
         }
         .scene.active { opacity: 1; transform: scale(1) translateY(0); }
         .scene.exit-up { opacity: 0; transform: scale(1.1) translateY(-150px); }
@@ -144,13 +145,11 @@
         <div id="camera">
             
             <!-- SCENE 01: THE PROBLEM (0:00-0:05) -->
-            <div class="scene active" id="scene-01">
+            <div class="scene" id="scene-01" style="display: block;">
                 <div class="terminal" id="term-01" style="width: 300px; padding: 20px; font-size: 24px; top: 540px; left: 960px;">
                     <span class="prompt">$</span><span id="cmd-01"></span><span class="cursor" id="cursor-01"></span>
                 </div>
                 
-                <!-- Nodes (1920x1080 canvas coordinates) -->
-                <!-- Center is 960, 540 -->
                 <div class="provider-icon" id="node-local" style="top: 240px; left: 460px; transform: translate(-50%, -50%) scale(0.5);"><svg fill="#A1A1AA" viewBox="0 0 24 24"><path d="M22 12H2M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></div>
                 <div class="provider-label" id="label-local" style="top: 320px; left: 460px;">LOCAL</div>
 
@@ -160,12 +159,8 @@
                 <div class="provider-icon" id="node-gdrive" style="top: 840px; left: 960px; transform: translate(-50%, -50%) scale(0.5);"><svg fill="#A1A1AA" viewBox="0 0 24 24"><path d="M12.01 1.485c-2.082 0-3.754.02-3.743.047.01.02 1.708 3.001 3.774 6.62l3.76 6.574h3.76c2.081 0 3.753-.02 3.742-.047-.005-.02-1.708-3.001-3.775-6.62l-3.76-6.574zm-4.76 1.73a789.828 789.861 0 0 0-3.63 6.319L0 15.868l1.89 3.298 1.885 3.297 3.62-6.335 3.618-6.33-1.88-3.287C8.1 4.704 7.255 3.22 7.25 3.214zm2.259 12.653-.203.348c-.114.198-.96 1.672-1.88 3.287a423.93 423.948 0 0 1-1.698 2.97c-.01.026 3.24.042 7.222.042h7.244l1.796-3.157c.992-1.734 1.85-3.23 1.906-3.323l.104-.167h-7.249z"/></svg></div>
                 <div class="provider-label" id="label-gdrive" style="top: 920px; left: 960px;">G-DRIVE</div>
 
-                <!-- Disconnected Lines to Center (960, 540) -->
-                <!-- Local(460, 240) -> 583px distance, 30.96 deg -->
                 <div class="line" id="line-1a" style="width: 583px; height: 2px; top: 240px; left: 460px; transform: rotate(30.96deg); transform-origin: top left;"></div>
-                <!-- S3(1460, 240) -> 583px distance, 149.04 deg -->
                 <div class="line" id="line-1b" style="width: 583px; height: 2px; top: 240px; left: 1460px; transform: rotate(149.04deg); transform-origin: top left;"></div>
-                <!-- G-Drive(960, 840) -> 300px distance, straight up (-90 deg) -->
                 <div class="line" id="line-1c" style="width: 2px; height: 300px; top: 540px; left: 960px;"></div>
 
                 <div class="kinetic-text" id="text-01" style="position: absolute; bottom: 8%; width: 100%; text-align: center; opacity: 0; font-size: 36px; color: var(--text-dim); transition: all 1s; transform: translateY(20px);">DIFFERENT STORAGE. DIFFERENT INTERFACES.</div>
@@ -213,7 +208,6 @@
                     <div class="output-line" id="out-04c" style="opacity: 0; transform: translateX(-10px); transition: all 0.3s;">report.pdf</div>
                 </div>
 
-                <!-- Virtual Objects on right side of 1920 -->
                 <div id="obj-04" style="position: absolute; left: 1200px; top: 540px; transform: translate(0, -50%); display: flex; flex-direction: column; gap: 40px; opacity: 0; transition: all 1s;">
                     <div style="display: flex; align-items: center; gap: 20px; font-family: var(--font-mono); font-size: 32px;"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> Documents</div>
                     <div style="display: flex; align-items: center; gap: 20px; font-family: var(--font-mono); font-size: 32px;"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> Pictures</div>
@@ -234,15 +228,12 @@
                     <div class="output-line" id="out-05" style="opacity:0; color: var(--term-green); transition: opacity 0.5s;">████████████████████ 100% Upload complete</div>
                 </div>
 
-                <!-- The Architectural Bridge -->
                 <div id="bridge" style="position: absolute; top: 500px; left: 960px; transform: translate(-50%, -50%); width: 200px; height: 100px; border: 2px solid var(--text-dim); display: flex; justify-content: center; align-items: center; font-family: var(--font-mono); letter-spacing: 4px; opacity: 0; transition: all 1s;">ENGINE</div>
 
-                <!-- Destinations -->
                 <div class="architecture-node" id="dest-local" style="top: 200px; left: 500px;">LOCAL</div>
                 <div class="architecture-node" id="dest-s3" style="top: 200px; left: 960px;">S3</div>
                 <div class="architecture-node" id="dest-drive" style="top: 200px; left: 1420px; border-color: var(--text-main);">G-DRIVE</div>
 
-                <!-- The File -->
                 <div class="file-icon" id="hero-file" style="top: 850px; left: 960px;">PDF</div>
 
                 <div class="kinetic-text" id="text-05" style="position: absolute; bottom: 8%; width: 100%; text-align: center; opacity: 0; font-size: 36px; color: var(--text-dim); transition: opacity 1s;">UPLOAD ANYWHERE.</div>
@@ -250,12 +241,10 @@
 
             <!-- SCENE 06: ONE CORE, MANY BACKENDS (0:32-0:40) -->
             <div class="scene" id="scene-06">
-                <!-- 3 Terminals -->
                 <div class="terminal multi-term" id="term-06a" style="top: 200px; left: 400px; width: 500px; font-size: 20px;"><span class="prompt">$</span> put local:</div>
                 <div class="terminal multi-term" id="term-06b" style="top: 200px; left: 960px; width: 500px; font-size: 20px;"><span class="prompt">$</span> put s3:</div>
                 <div class="terminal multi-term" id="term-06c" style="top: 200px; left: 1520px; width: 500px; font-size: 20px;"><span class="prompt">$</span> put drive:</div>
 
-                <!-- All 6 Providers mapped properly -->
                 <div class="architecture-node" id="arch-core" style="top: 450px; left: 960px; border-color: var(--text-main); color: var(--text-main); font-weight: 700; width: 400px; height: 100px; font-size: 32px;">STORAGE BRIDGE</div>
                 
                 <div class="line" id="arch-line-v" style="width: 2px; height: 100px; top: 500px; left: 960px; transform: scaleY(0); transform-origin: top;"></div>
@@ -264,7 +253,6 @@
                 <div class="line" id="arch-line-v2" style="width: 2px; height: 50px; top: 680px; left: 960px; transform: scaleY(0); transform-origin: top;"></div>
                 <div class="line" id="arch-line-h" style="width: 1400px; height: 2px; top: 730px; left: 960px; transform: translateX(-50%) scaleX(0);"></div>
 
-                <!-- 6 drops -->
                 <div class="line arch-drop" style="width: 2px; height: 50px; top: 730px; left: 260px; transform: scaleY(0); transform-origin: top;"></div>
                 <div class="line arch-drop" style="width: 2px; height: 50px; top: 730px; left: 540px; transform: scaleY(0); transform-origin: top;"></div>
                 <div class="line arch-drop" style="width: 2px; height: 50px; top: 730px; left: 820px; transform: scaleY(0); transform-origin: top;"></div>
@@ -272,7 +260,6 @@
                 <div class="line arch-drop" style="width: 2px; height: 50px; top: 730px; left: 1380px; transform: scaleY(0); transform-origin: top;"></div>
                 <div class="line arch-drop" style="width: 2px; height: 50px; top: 730px; left: 1660px; transform: scaleY(0); transform-origin: top;"></div>
 
-                <!-- 6 nodes with actual SVGs! -->
                 <div class="architecture-node arch-n" style="top: 840px; left: 260px; width: 220px;">
                     <svg class="node-icon" fill="#A1A1AA" viewBox="0 0 24 24"><path d="M22 12H2M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>LOCAL</div>
                 <div class="architecture-node arch-n" style="top: 840px; left: 540px; width: 220px;">
@@ -321,12 +308,12 @@
 
             <!-- SCENE 09: ARCHITECTURE EXPANSION (0:53-0:57) -->
             <div class="scene" id="scene-09">
-                <!-- Architecture with ALL providers and ICONS perfectly laid out -->
-                <div class="architecture-node" style="top: 200px; left: 960px; border-color: var(--term-green); color: var(--term-green);">MCP (JSON-RPC)</div>
+                <!-- Inline opacities added to immediately render the scene without needing JS class toggle -->
+                <div class="architecture-node" style="top: 200px; left: 960px; border-color: var(--term-green); color: var(--term-green); opacity: 1 !important;">MCP (JSON-RPC)</div>
                 <div class="line" style="width: 2px; height: 100px; top: 250px; left: 960px; opacity: 1;"></div>
-                <div class="architecture-node" style="top: 400px; left: 960px; border-color: var(--text-main); font-weight: 700; font-size: 32px;">STORAGE BRIDGE</div>
+                <div class="architecture-node" style="top: 400px; left: 960px; border-color: var(--text-main); font-weight: 700; font-size: 32px; opacity: 1 !important;">STORAGE BRIDGE</div>
                 <div class="line" style="width: 2px; height: 80px; top: 450px; left: 960px; opacity: 1;"></div>
-                <div class="architecture-node" style="top: 550px; left: 960px; border: none; font-size: 20px; color: var(--text-dim);">PROVIDER API</div>
+                <div class="architecture-node" style="top: 550px; left: 960px; border: none; font-size: 20px; color: var(--text-dim); opacity: 1 !important;">PROVIDER API</div>
                 
                 <div class="line" style="width: 2px; height: 50px; top: 580px; left: 960px; opacity: 1;"></div>
                 <div class="line" style="width: 1400px; height: 2px; top: 630px; left: 960px; transform: translateX(-50%); opacity: 1;"></div>
@@ -338,17 +325,18 @@
                 <div class="line" style="width: 2px; height: 50px; top: 630px; left: 1380px; opacity: 1;"></div>
                 <div class="line" style="width: 2px; height: 50px; top: 630px; left: 1660px; opacity: 1;"></div>
 
-                <div class="architecture-node" style="top: 740px; left: 260px; width: 220px;">
+                <!-- Icons added inline and opacity set to 1 so they actually render -->
+                <div class="architecture-node" style="top: 740px; left: 260px; width: 220px; opacity: 1 !important;">
                     <svg class="node-icon" fill="#A1A1AA" viewBox="0 0 24 24"><path d="M22 12H2M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>LOCAL</div>
-                <div class="architecture-node" style="top: 740px; left: 540px; width: 220px;">
+                <div class="architecture-node" style="top: 740px; left: 540px; width: 220px; opacity: 1 !important;">
                     <svg class="node-icon" fill="#A1A1AA" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>S3</div>
-                <div class="architecture-node" style="top: 740px; left: 820px; width: 220px;">
+                <div class="architecture-node" style="top: 740px; left: 820px; width: 220px; opacity: 1 !important;">
                     <svg class="node-icon" fill="#A1A1AA" viewBox="0 0 24 24"><path d="M12.01 1.485c-2.082 0-3.754.02-3.743.047.01.02 1.708 3.001 3.774 6.62l3.76 6.574h3.76c2.081 0 3.753-.02 3.742-.047-.005-.02-1.708-3.001-3.775-6.62l-3.76-6.574zm-4.76 1.73a789.828 789.861 0 0 0-3.63 6.319L0 15.868l1.89 3.298 1.885 3.297 3.62-6.335 3.618-6.33-1.88-3.287C8.1 4.704 7.255 3.22 7.25 3.214zm2.259 12.653-.203.348c-.114.198-.96 1.672-1.88 3.287a423.93 423.948 0 0 1-1.698 2.97c-.01.026 3.24.042 7.222.042h7.244l1.796-3.157c.992-1.734 1.85-3.23 1.906-3.323l.104-.167h-7.249z"/></svg>G-DRIVE</div>
-                <div class="architecture-node" style="top: 740px; left: 1100px; width: 220px; color: var(--text-dim); border-color: var(--line-dim);">
+                <div class="architecture-node" style="top: 740px; left: 1100px; width: 220px; color: var(--text-dim); border-color: var(--line-dim); opacity: 1 !important;">
                     <svg class="node-icon" fill="#A1A1AA" viewBox="0 0 24 24"><path d="M12 2 4 8l8 6 8-6zm0 14-8-6 8 6 8-6z"/></svg>DROPBOX*</div>
-                <div class="architecture-node" style="top: 740px; left: 1380px; width: 220px; color: var(--text-dim); border-color: var(--line-dim);">
+                <div class="architecture-node" style="top: 740px; left: 1380px; width: 220px; color: var(--text-dim); border-color: var(--line-dim); opacity: 1 !important;">
                     <svg class="node-icon" fill="#A1A1AA" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>B2*</div>
-                <div class="architecture-node" style="top: 740px; left: 1660px; width: 220px; color: var(--text-dim); border-color: var(--line-dim);">
+                <div class="architecture-node" style="top: 740px; left: 1660px; width: 220px; color: var(--text-dim); border-color: var(--line-dim); opacity: 1 !important;">
                     <svg class="node-icon" fill="#A1A1AA" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>R2*</div>
                 
                 <div class="kinetic-text" id="text-09" style="position: absolute; bottom: 8%; width: 100%; text-align: center; opacity: 0; font-size: 36px; color: var(--text-dim); transition: opacity 1s;">BUILT FOR HUMANS. READY FOR AGENTS.</div>
@@ -400,25 +388,29 @@
                 oldEl.classList.remove('active');
                 oldEl.classList.add(exitClass);
             }
-            await sleep(800);
+            await sleep(300); // Partial overlap for smoothness (cross-slide)
             if (newId) {
                 const newEl = document.getElementById(newId);
+                newEl.style.display = 'block';
+                void newEl.offsetWidth; // Reflow
                 newEl.classList.remove('exit-up', 'exit-down', 'exit-left'); 
                 newEl.classList.add('active');
+            }
+            await sleep(300); // Wait for transition to complete
+            if (oldId) {
+                // Hard hide to entirely prevent any visual overlap between deeply nested elements
+                document.getElementById(oldId).style.display = 'none';
             }
         }
 
         async function startSequence() {
             document.getElementById('play-overlay').style.display = 'none';
-
-            // Base state: NO camera offset. All elements fit natively in 1920x1080.
             camera.style.transform = 'scale(1)';
 
             /* SCENE 01: THE PROBLEM (0:00 - 0:05) */
             await typeCmd('cmd-01', 'cursor-01', 'ls');
             await sleep(300);
             
-            // Nodes appear
             document.getElementById('node-local').classList.add('fade-in');
             document.getElementById('node-s3').classList.add('fade-in');
             document.getElementById('node-gdrive').classList.add('fade-in');
@@ -428,7 +420,6 @@
             document.getElementById('label-s3').classList.add('fade-in-basic');
             document.getElementById('label-gdrive').classList.add('fade-in-basic');
             
-            // Connected lines
             document.getElementById('line-1a').classList.add('fade-in-basic');
             document.getElementById('line-1b').classList.add('fade-in-basic');
             document.getElementById('line-1c').classList.add('fade-in-basic');
