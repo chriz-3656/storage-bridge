@@ -71,6 +71,84 @@ func runMCPServer() error {
 			}
 
 			handleToolCall(&req, &toolReq)
+		} else if req.Method == "tools/list" {
+			result := map[string]interface{}{
+				"tools": []map[string]interface{}{
+					{
+						"name": "read_file",
+						"description": "Read file contents from the storage bridge",
+						"inputSchema": map[string]interface{}{
+							"type": "object",
+							"properties": map[string]interface{}{
+								"target": map[string]interface{}{"type": "string"},
+							},
+							"required": []string{"target"},
+						},
+					},
+					{
+						"name": "write_file",
+						"description": "Write content to a file on the storage bridge",
+						"inputSchema": map[string]interface{}{
+							"type": "object",
+							"properties": map[string]interface{}{
+								"target": map[string]interface{}{"type": "string"},
+								"content": map[string]interface{}{"type": "string"},
+							},
+							"required": []string{"target", "content"},
+						},
+					},
+					{
+						"name": "list_directory",
+						"description": "List files in a directory on the storage bridge",
+						"inputSchema": map[string]interface{}{
+							"type": "object",
+							"properties": map[string]interface{}{
+								"target": map[string]interface{}{"type": "string"},
+							},
+							"required": []string{"target"},
+						},
+					},
+					{
+						"name": "make_directory",
+						"description": "Create a new directory",
+						"inputSchema": map[string]interface{}{
+							"type": "object",
+							"properties": map[string]interface{}{
+								"target": map[string]interface{}{"type": "string"},
+							},
+							"required": []string{"target"},
+						},
+					},
+					{
+						"name": "move_file",
+						"description": "Rename or move a file/directory",
+						"inputSchema": map[string]interface{}{
+							"type": "object",
+							"properties": map[string]interface{}{
+								"src": map[string]interface{}{"type": "string"},
+								"dest": map[string]interface{}{"type": "string"},
+							},
+							"required": []string{"src", "dest"},
+						},
+					},
+				},
+			}
+			sendResult(req.ID, result)
+		} else if req.Method == "initialize" {
+			result := map[string]interface{}{
+				"protocolVersion": "2024-11-05",
+				"capabilities": map[string]interface{}{
+					"tools": map[string]interface{}{},
+				},
+				"serverInfo": map[string]interface{}{
+					"name": "storage-bridge-mcp",
+					"version": "1.0.0",
+				},
+			}
+			sendResult(req.ID, result)
+		} else if req.Method == "notifications/initialized" {
+			// Do nothing
+			continue
 		} else {
 			sendError(req.ID, -32601, "Method not found")
 		}
@@ -84,7 +162,7 @@ func handleToolCall(req *JSONRPCRequest, toolReq *CallToolRequest) {
 
 	switch toolReq.Name {
 	case "read_file":
-		target := toolReq.Arguments["target"]
+		target := resolveSimpleTarget(toolReq.Arguments["target"], "")
 		provider, path, err := resolveProvider(target)
 		if err != nil {
 			sendError(req.ID, -32000, err.Error())
@@ -114,7 +192,7 @@ func handleToolCall(req *JSONRPCRequest, toolReq *CallToolRequest) {
 		}
 
 	case "write_file":
-		target := toolReq.Arguments["target"]
+		target := resolveSimpleTarget(toolReq.Arguments["target"], "")
 		content := toolReq.Arguments["content"]
 		provider, path, err := resolveProvider(target)
 		if err != nil {
@@ -139,7 +217,7 @@ func handleToolCall(req *JSONRPCRequest, toolReq *CallToolRequest) {
 		}
 
 	case "list_directory":
-		target := toolReq.Arguments["target"]
+		target := resolveSimpleTarget(toolReq.Arguments["target"], "")
 		provider, path, err := resolveProvider(target)
 		if err != nil {
 			sendError(req.ID, -32000, err.Error())
@@ -175,6 +253,64 @@ func handleToolCall(req *JSONRPCRequest, toolReq *CallToolRequest) {
 				{
 					"type": "text",
 					"text": strings.Join(entries, "\n"),
+				},
+			},
+		}
+
+	case "make_directory":
+		target := resolveSimpleTarget(toolReq.Arguments["target"], "")
+		provider, path, err := resolveProvider(target)
+		if err != nil {
+			sendError(req.ID, -32000, err.Error())
+			return
+		}
+		
+		err = provider.Mkdir(ctx, path)
+		if err != nil {
+			sendError(req.ID, -32000, err.Error())
+			return
+		}
+
+		result = map[string]interface{}{
+			"content": []map[string]interface{}{
+				{
+					"type": "text",
+					"text": "Directory created successfully",
+				},
+			},
+		}
+
+	case "move_file":
+		src := resolveSimpleTarget(toolReq.Arguments["src"], "")
+		dest := resolveSimpleTarget(toolReq.Arguments["dest"], "")
+		
+		srcProv, srcPath, err := resolveProvider(src)
+		if err != nil {
+			sendError(req.ID, -32000, err.Error())
+			return
+		}
+		destProv, destPath, err := resolveProvider(dest)
+		if err != nil {
+			sendError(req.ID, -32000, err.Error())
+			return
+		}
+		
+		if srcProv.Name() != destProv.Name() {
+			sendError(req.ID, -32000, "Cannot move files between different providers yet")
+			return
+		}
+		
+		err = srcProv.Move(ctx, srcPath, destPath)
+		if err != nil {
+			sendError(req.ID, -32000, err.Error())
+			return
+		}
+		
+		result = map[string]interface{}{
+			"content": []map[string]interface{}{
+				{
+					"type": "text",
+					"text": "File moved successfully",
 				},
 			},
 		}
