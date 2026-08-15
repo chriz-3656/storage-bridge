@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"strings"
 	"time"
 
 	"github.com/storage-bridge/core/pkg/storage"
@@ -35,14 +34,18 @@ func New(upstreams []storage.Provider, policy Policy) *Provider {
 	}
 }
 
-func (p *Provider) Stat(ctx context.Context, path string) (storage.FileEntry, error) {
+func (p *Provider) Name() string {
+	return "union"
+}
+
+func (p *Provider) Stat(ctx context.Context, path string) (*storage.Entry, error) {
 	for _, up := range p.Upstreams {
 		entry, err := up.Stat(ctx, path)
 		if err == nil {
 			return entry, nil
 		}
 	}
-	return storage.FileEntry{}, fmt.Errorf("file not found in any upstream: %s", path)
+	return nil, fmt.Errorf("file not found in any upstream: %s", path)
 }
 
 // unionIterator merges results from multiple iterators
@@ -53,7 +56,7 @@ type unionIterator struct {
 	seen     map[string]bool
 }
 
-func (u *unionIterator) Next(ctx context.Context) (storage.FileEntry, error) {
+func (u *unionIterator) Next(ctx context.Context) (*storage.Entry, error) {
 	for u.currIdx < len(u.iters) {
 		entry, err := u.iters[u.currIdx].Next(ctx)
 		if err == io.EOF {
@@ -61,7 +64,7 @@ func (u *unionIterator) Next(ctx context.Context) (storage.FileEntry, error) {
 			continue
 		}
 		if err != nil {
-			return storage.FileEntry{}, err
+			return nil, err
 		}
 		
 		// Deduplicate
@@ -71,7 +74,7 @@ func (u *unionIterator) Next(ctx context.Context) (storage.FileEntry, error) {
 		u.seen[entry.Path] = true
 		return entry, nil
 	}
-	return storage.FileEntry{}, io.EOF
+	return nil, io.EOF
 }
 
 func (p *Provider) List(ctx context.Context, prefix string) (storage.Iterator, error) {
