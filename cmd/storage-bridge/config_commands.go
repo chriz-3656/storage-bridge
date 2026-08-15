@@ -32,12 +32,7 @@ var authLoginCmd = &cobra.Command{
 
 		switch service {
 		case "google":
-			credsPath := "credentials.json"
-			if _, err := os.Stat(credsPath); os.IsNotExist(err) {
-				credsPath = filepath.Join(filepath.Dir(cfgMgr.Path), "credentials.json")
-			}
-			
-			tok, err := drive.AuthLogin(context.Background(), credsPath)
+			tok, err := drive.AuthLogin(context.Background())
 			if err != nil {
 				return err
 			}

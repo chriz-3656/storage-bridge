@@ -57,21 +57,12 @@ func resolveProvider(target string) (storage.Provider, string, error) {
 					return nil, "", err
 				}
 				
-				credsPath := "credentials.json"
-				if _, err := os.Stat(credsPath); os.IsNotExist(err) {
-					credsPath = filepath.Join(filepath.Dir(cfgMgr.Path), "credentials.json")
+				conf := &oauth2.Config{
+					ClientID:     drive.DefaultClientID,
+					ClientSecret: drive.DefaultClientSecret,
+					Endpoint:     google.Endpoint,
+					Scopes:       []string{driveapi.DriveScope},
 				}
-				
-				b, err := os.ReadFile(credsPath)
-				if err != nil {
-					return nil, "", fmt.Errorf("unable to read client secret file: %v", err)
-				}
-			
-				conf, err := google.ConfigFromJSON(b, driveapi.DriveScope)
-				if err != nil {
-					return nil, "", fmt.Errorf("unable to parse client secret file to config: %v", err)
-				}
-				
 				client := conf.Client(context.Background(), &tok)
 				provider, err := drive.New(context.Background(), client)
 				if err != nil {
@@ -110,13 +101,11 @@ func resolveProvider(target string) (storage.Provider, string, error) {
 		client := s3sdk.NewFromConfig(cfg)
 		return s3.New(client, bucket), key, nil
 	case "drive":
-		b, err := os.ReadFile("credentials.json")
-		if err != nil {
-			return nil, "", fmt.Errorf("credentials.json not found")
-		}
-		conf, err := google.ConfigFromJSON(b, driveapi.DriveScope)
-		if err != nil {
-			return nil, "", err
+		conf := &oauth2.Config{
+			ClientID:     drive.DefaultClientID,
+			ClientSecret: drive.DefaultClientSecret,
+			Endpoint:     google.Endpoint,
+			Scopes:       []string{driveapi.DriveScope},
 		}
 		tokRaw, err := os.ReadFile("token.json")
 		if err != nil {
